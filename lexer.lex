@@ -5,7 +5,6 @@
 
 %option noyywrap
 %option yylineno
-%option caseless
 
 
 
@@ -61,8 +60,19 @@ continue							return CONTINUE;
 
 (==)|(!=)|(<)|(>)|(<=)|(>=)			return RELOP;
 
++|-|*|\/							return BINOP;
 
+[a-zA-Z][a-zA-Z0-9]*				return ID;
 
+0|([1-9][0-9]*)						return NUM;
+
+"([^\n\r\"\\]|\\[rnt"\\])+"			return STRING;
+
+//[^\r\n]*[ \r|\n|\r\n]?			;
+
+[ \t\r\n]							;
+
+.									printf("lexical error\n");
 
 %%
 
