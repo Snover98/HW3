@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 98)
 set(SOURCE_FILES
         output.cpp
         output.hpp
-        tokens.h
-        lexer.lex)
+        scanner.lex
+        parser.ypp)
 
 add_executable(HW3 ${SOURCE_FILES})
