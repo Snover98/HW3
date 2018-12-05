@@ -128,35 +128,35 @@ SimpleStatement:    LBRACE Statements RBRACE
                     | CONTINUE SC
 ;
 
-Call:           ID LPAREN ExpList RPAREN
-                | ID LPAREN RPAREN
+Call:               ID LPAREN ExpList RPAREN
+                    | ID LPAREN RPAREN
 ;
 
-ExpList:        Exp
-                | Exp COMMA ExpList
+ExpList:            Exp
+                    | Exp COMMA ExpList
 ;
 
-Type:           INT
-                | BYTE
-                | BOOL
+Type:               INT
+                    | BYTE
+                    | BOOL
 ;
 
-StructType:     STRUCT ID;
+StructType:         STRUCT ID;
 
-Exp:            LPAREN Exp RPAREN
-                | Exp BINOP Exp
-                | ID
-                | ID PERIOD ID
-                | Call
-                | NUM
-                | NUM B
-                | STRING
-                | TRUE
-                | FALSE
-                | NOT exp
-                | Exp AND Exp
-                | Exp OR Exp
-                | Exp RELOP Exp
+Exp:                LPAREN Exp RPAREN
+                    | Exp BINOP Exp
+                    | ID
+                    | ID PERIOD ID
+                    | Call
+                    | NUM
+                    | NUM B
+                    | STRING
+                    | TRUE
+                    | FALSE
+                    | NOT exp
+                    | Exp AND Exp
+                    | Exp OR Exp
+                    | Exp RELOP Exp
 ;
 
 
