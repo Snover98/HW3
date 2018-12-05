@@ -7,7 +7,6 @@ set(SOURCE_FILES
         output.cpp
         output.hpp
         scanner.lex
-        parser.ypp
-        )
+        parser.ypp)
 
 add_executable(HW3 ${SOURCE_FILES})
