@@ -1,6 +1,6 @@
 %{
 /*C lang stuff*/
-#include "tokens.h"
+#include "parser.tab.hpp"
 %}
 
 %option noyywrap
@@ -72,7 +72,7 @@ continue							return CONTINUE;
 
 [ \t\r\n]							;
 
-.									printf("lexical error\n");
+.									return ERROR;
 
 %%
 
