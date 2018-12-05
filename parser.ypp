@@ -1,0 +1,154 @@
+%{
+/*C++ lang stuff*/
+#include <iostream>
+
+using namespace std
+
+#define YYSTYPE Node*
+int yylex();
+void yyerror(const char*);
+
+struct Node{
+
+};
+
+class Num : public Node{
+
+
+};
+
+%}
+
+%left LPAREN
+%left RPAREN
+%left PERIOD
+%left BINOP
+%left RELOP
+%left AND
+%left OR
+%token TRUE
+%token FALSE
+%token RETURN
+%token IF
+%token ELSE
+%token WHILE
+%token BREAK
+%token CONTINUE
+%token SC
+%token COMMA
+%token LBRACE
+%token RBRACE
+%right ASSIGN
+%token VOID
+%token ID
+%token NUM
+%token STRING
+%token INT
+%token BYTE
+%token B
+%token BOOL
+%token STRUCT
+
+
+
+
+
+
+
+
+
+%%
+
+Program:        Structs Funcs;
+
+Funcs:          /*epsilon*/
+                | FuncDecl Funcs
+;
+
+FuncDecl:       RetType ID LPAREN Formals RPAREN LBRACE Statements RBRACE;
+
+Structs:        /*epsilon*/
+                | StructsDecl Structs
+;
+
+StructsDecl:    STRUCT ID LBRACE StructMemList RBRACE SC;
+
+RetType:        Type
+                | VOID
+;
+
+Formals:        /*epsilon*/
+                FormalsList
+;
+
+FormalsList:    FormalDecl
+                | FormalDecl COMMA FormalsList
+;
+
+FormalDecl:     Type ID
+                | StructType ID
+;
+
+StructMemList:  StructMem
+                | StructMem StructMemList
+;
+
+StructMem:      Type ID SC;
+
+Statements:     Statement
+                | Statements Statement
+;
+
+Statement:      LBRACE Statements RBRACE
+                | Type ID SC
+                | StructType ID SC
+                | STRUCT ID LBRACE StructMemList RBRACE SC
+                | Type ID ASSIGN Exp SC
+                | StructType ID ASSIGN Exp SC
+                | ID ASSIGN Exp SC
+                | ID PERIOD ID ASSIGN Exp SC
+                | Call SC
+                | RETURN SC
+                | RETURN Exp SC
+                | IF LPAREN Exp RPAREN Statement
+                | IF LPAREN Exp RPAREN Statement ELSE Statement
+                | WHILE LPAREN Exp RPAREN Statement
+                | BREAK SC
+                | CONTINUE SC
+;
+
+Call:           ID LPAREN ExpList RPAREN
+                | ID LPAREN RPAREN
+;
+
+ExpList:        Exp
+                | Exp COMMA ExpList
+;
+
+Type:           INT
+                | BYTE
+                | BOOL
+;
+
+StructType:     STRUCT ID;
+
+Exp:            LPAREN Exp RPAREN
+                | Exp BINOP Exp
+                | ID
+                | ID PERIOD ID
+                | Call
+                | NUM
+                | NUM B
+                | STRING
+                | TRUE
+                | FALSE
+                | NOT exp
+                | Exp AND Exp
+                | Exp OR Exp
+                | Exp RELOP Exp
+;
+
+
+
+%%
+
