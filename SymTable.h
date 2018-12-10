@@ -39,8 +39,6 @@ struct SymEntry {
 
 };
 
-class SymTable;
-
 class SymTable {
 private:
     int table_offset;
