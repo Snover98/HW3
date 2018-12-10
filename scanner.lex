@@ -60,7 +60,7 @@ continue							return CONTINUE;
 
 (==)|(!=)|(<)|(>)|(<=)|(>=)			return RELOP;
 
-+|-|*|\/							return BINOP;
+\+|\-|\*|\/							return BINOP;
 
 [a-zA-Z][a-zA-Z0-9]*				return ID;
 

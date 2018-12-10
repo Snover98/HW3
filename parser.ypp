@@ -33,6 +33,7 @@ class Num : public Node{
 %left RELOP
 %left AND
 %left OR
+%token NOT
 %token TRUE
 %token FALSE
 %token RETURN
@@ -110,14 +111,14 @@ Statement:          OpenStatement
                     | ClosedStatement
 ;
 
-OpenStatement:      IF LP Exp RP Statement
-                    | IF LP Exp RP ClosedStatement ELSE OpenStatement
-                    | WHILE LP Exp RP OpenStatement
+OpenStatement:      IF LPAREN Exp RPAREN Statement
+                    | IF LPAREN Exp RPAREN ClosedStatement ELSE OpenStatement
+                    | WHILE LPAREN Exp RPAREN OpenStatement
 ;
 
 ClosedStatement:    SimpleStatement
-                    | IF LP expression RP ClosedStatement ELSE ClosedStatement
-                    | WHILE LP expression RP ClosedStatement
+                    | IF LPAREN Exp RPAREN ClosedStatement ELSE ClosedStatement
+                    | WHILE LPAREN Exp RPAREN ClosedStatement
 ;
 
 SimpleStatement:    LBRACE Statements RBRACE
@@ -160,7 +161,7 @@ Exp:                LPAREN Exp RPAREN
                     | STRING
                     | TRUE
                     | FALSE
-                    | NOT exp
+                    | NOT Exp
                     | Exp AND Exp
                     | Exp OR Exp
                     | Exp RELOP Exp
