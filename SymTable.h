@@ -20,8 +20,13 @@ struct SymEntry {
     varType type;
     int offset;
     FunctionType func_type;
+    std::string struct_type;
 
-    SymEntry():type(NOTYPE),offset(0){}
+    SymEntry() : type(NOTYPE), offset(0) {}
+
+    SymEntry(std::string ID, std::string struct_type, int offset) : ID(std::string(ID)), type(STRUCTTYPE),
+                                                                    offset(offset),
+                                                                    struct_type(std::string(struct_type)) {}
 
     SymEntry(std::string ID, varType type, int offset) : ID(std::string(ID)), type(type), offset(offset) {}
 
@@ -41,17 +46,19 @@ private:
     int table_offset;
     std::vector<SymEntry> entries;
 
-    SymEntry getSymbolEntry(std::string ID);
-
 
 public:
     SymTable(int offset) : table_offset(offset), entries(std::vector<SymEntry>()) {}
+
+    SymEntry getSymbolEntry(std::string ID);
 
     bool isSymInTable(std::string ID);
 
     varType getSymType(std::string ID);
 
     FunctionType getFunctionType(std::string ID);
+
+    std::string getStructType(std::string ID);
 
 };
 

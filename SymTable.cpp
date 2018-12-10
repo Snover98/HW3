@@ -29,3 +29,11 @@ bool SymTable::isSymInTable(std::string ID) {
 FunctionType SymTable::getFunctionType(std::string ID) {
     return getSymbolEntry(ID).func_type;
 }
+
+std::string SymTable::getStructType(std::string ID){
+    return getSymbolEntry(ID).struct_type;
+}
+
+
+
+
