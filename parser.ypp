@@ -1,12 +1,19 @@
 %{
 /*C++ lang stuff*/
 #include <iostream>
-
-using namespace std;
+#include "SymTable.h"
+#include <vector>
 
 #define YYSTYPE Node*
 int yylex();
 void yyerror(const char*);
+
+std::vector<SymTable> tables_stack = std::vector<SymTable>();
+
+
+
+
+
 
 struct Node{
 
