@@ -48,6 +48,11 @@ private:
 public:
     SymTable(int offset) : table_offset(offset), entries(std::vector<SymEntry>()) {}
 
+    void addEntry(SymEntry e);
+    void addEntry(std::string ID, std::string struct_type, int offset);
+    void addEntry(std::string ID, varType type);
+    void addEntry(std::string ID, std::vector<varType> func_params, varType ret_type);
+
     SymEntry getSymbolEntry(std::string ID);
 
     bool isSymInTable(std::string ID);
