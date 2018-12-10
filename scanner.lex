@@ -66,9 +66,9 @@ continue							return CONTINUE;
 
 0|([1-9][0-9]*)						return NUM;
 
-"([^\n\r\"\\]|\\[rnt"\\])+"			return STRING;
+\"([^\n\r\"\\]|\\[rnt"\\])+\"			return STRING;
 
-//[^\r\n]*[ \r|\n|\r\n]?			;
+[^\r\n]*[ \r|\n|\r\n]?			;
 
 [ \t\r\n]							;
 
