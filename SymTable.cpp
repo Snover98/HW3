@@ -71,7 +71,7 @@ void SymTable::addEntry(std::string ID, std::vector<varType> func_params, varTyp
 
 StructType SymTable::getStructTypeEntry(std::string ID) {
     //find the struct type with the same ID in this table
-    for (std::vector<StructType>::iterator it = scope_structs.begin(); it != scope_structs.end(); ++it) {
+    for (std::vector<StructType>::iterator it = structs.begin(); it != structs.end(); ++it) {
         if (ID.compare((*it).type_name) == 0) {
             return (*it);
         }
@@ -85,17 +85,17 @@ int SymTable::structTypeOffset(std::string ID) {
     return getStructTypeEntry(ID).fields.size();
 }
 
-void SymTable::addStructType(StructType t) {
-    if (isStructTypeInTable(t.type_name)) {
-        throw ShadowingException(t.type_name);
-    }
+//void SymTable::addStructType(StructType t) {
+//    if (isStructTypeInTable(t.type_name)) {
+//        throw ShadowingException(t.type_name);
+//    }
+//
+//    structs.push_back(t);
+//}
 
-    scope_structs.push_back(t);
-}
-
-void SymTable::addStructType(std::string ID, std::vector<std::pair<std::string, varType> > fields) {
-    addStructType(StructType(ID, fields));
-}
+//void SymTable::addStructType(std::string ID, std::vector<std::pair<std::string, varType> > fields) {
+//    addStructType(StructType(ID, fields));
+//}
 
 bool SymTable::isStructTypeInTable(std::string ID) {
     return !getStructTypeEntry(ID).fields.empty();
