@@ -79,10 +79,6 @@ public:
 
     void addEntry(std::string ID, std::vector<varType> func_params, varType ret_type);
 
-//    void addStructType(StructType t);
-
-//    void addStructType(std::string ID, std::vector<std::pair<std::string, varType> > fields);
-
     SymEntry getSymbolEntry(std::string ID);
 
     bool isSymInTable(std::string ID);

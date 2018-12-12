@@ -85,18 +85,6 @@ int SymTable::structTypeOffset(std::string ID) {
     return getStructTypeEntry(ID).fields.size();
 }
 
-//void SymTable::addStructType(StructType t) {
-//    if (isStructTypeInTable(t.type_name)) {
-//        throw ShadowingException(t.type_name);
-//    }
-//
-//    structs.push_back(t);
-//}
-
-//void SymTable::addStructType(std::string ID, std::vector<std::pair<std::string, varType> > fields) {
-//    addStructType(StructType(ID, fields));
-//}
-
 bool SymTable::isStructTypeInTable(std::string ID) {
     return !getStructTypeEntry(ID).fields.empty();
 }
