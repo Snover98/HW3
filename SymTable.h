@@ -58,15 +58,18 @@ class SymTable {
 private:
     int table_offset;
     std::vector<SymEntry> scope_entries;
-    std::vector<StructType> structs;
+    const std::vector<StructType> &structs;
     SymTable *parent;
 
     int typeOffset(SymEntry entry);
 
 
 public:
-    SymTable(int offset, SymTable *parent = NULL) : table_offset(offset), scope_entries(std::vector<SymEntry>()),
-                                                    parent(parent), structs(std::vector<StructType>()) {}
+    SymTable(const std::vector<StructType> &structs, int offset = 0, SymTable *parent = NULL) : table_offset(offset),
+                                                                                                scope_entries(
+                                                                                                        std::vector<SymEntry>()),
+                                                                                                parent(parent),
+                                                                                                structs(structs) {}
 
     void addEntry(SymEntry e);
 
