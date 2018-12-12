@@ -7,6 +7,6 @@ set(SOURCE_FILES
         output.cpp
         output.hpp
         scanner.lex
-        parser.ypp SymTable.cpp SymTable.h)
+        parser.ypp SymTable.cpp SymTable.h Exceptions.h)
 
 add_executable(HW3 ${SOURCE_FILES})
