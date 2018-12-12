@@ -20,7 +20,7 @@ int SymTable::typeOffset(SymEntry entry) {
     return offset;
 }
 
-SymEntry SymTable::getSymbolEntry(std::string ID) {
+SymEntry SymTable::getSymbolEntry(const std::string &ID) {
     //find the entry with the same ID in this table
     for (std::vector<SymEntry>::iterator it = scope_entries.begin(); it != scope_entries.end(); ++it) {
         if (ID.compare((*it).ID) == 0) {
@@ -33,19 +33,19 @@ SymEntry SymTable::getSymbolEntry(std::string ID) {
 }
 
 
-varType SymTable::getSymType(std::string ID) {
+varType SymTable::getSymType(const std::string &ID) {
     return getSymbolEntry(ID).type;
 }
 
-bool SymTable::isSymInTable(std::string ID) {
+bool SymTable::isSymInTable(const std::string &ID) {
     return (getSymbolEntry(ID).type != NOTYPE);
 }
 
-FunctionType SymTable::getFunctionType(std::string ID) {
+FunctionType SymTable::getFunctionType(const std::string &ID) {
     return getSymbolEntry(ID).func_type;
 }
 
-std::string SymTable::getStructType(std::string ID) {
+std::string SymTable::getStructType(const std::string &ID) {
     return getSymbolEntry(ID).struct_type;
 }
 
@@ -57,18 +57,18 @@ void SymTable::addEntry(SymEntry e) {
     scope_entries.push_back(e);
 }
 
-void SymTable::addEntry(std::string ID, std::string struct_type) {
+void SymTable::addEntry(const std::string &ID, const std::string &struct_type) {
     addEntry(SymEntry(ID, struct_type, CALCOFFSET()));
 }
 
-void SymTable::addEntry(std::string ID, varType type) {
+void SymTable::addEntry(const std::string &ID, varType type) {
     addEntry(SymEntry(ID, type, CALCOFFSET()));
 }
 
-void SymTable::addEntry(std::string ID, std::vector<varType> func_params, varType ret_type) {
+void SymTable::addEntry(const std::string &ID, const std::vector<varType> &func_params, varType ret_type) {
     addEntry(SymEntry(ID, CALCOFFSET(), func_params, ret_type));
 }
 
-int SymTable::structTypeOffset(std::string ID) {
+int SymTable::structTypeOffset(const std::string &ID) {
     return getStructTypeEntry(structs, ID).fields.size();
 }

@@ -25,10 +25,14 @@ struct StructType {
             : type_name(std::string(name)), fields(std::vector<std::pair<std::string, varType> >(fields)) {}
 };
 
-void addStructType(std::vector<StructType> structs, StructType t);
-void addStructType(std::vector<StructType> structs, std::string ID, std::vector<std::pair<std::string, varType> > fields);
-bool isStructTypeInTable(std::vector<StructType> structs, std::string ID);
-StructType getStructTypeEntry(std::vector<StructType> structs, std::string ID);
+void addStructType(std::vector<StructType> &structs, StructType t);
+
+void addStructType(std::vector<StructType> &structs, const std::string &ID,
+                   const std::vector<std::pair<std::string, varType> > &fields);
+
+bool isStructTypeInTable(const std::vector<StructType> &structs, const std::string &ID);
+
+StructType getStructTypeEntry(const std::vector<StructType> &structs, const std::string &ID);
 
 
 #endif //HW3_STRUCTTYPE_H

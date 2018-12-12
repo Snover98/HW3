@@ -57,23 +57,23 @@ public:
 
     void addEntry(SymEntry e);
 
-    void addEntry(std::string ID, std::string struct_type);
+    void addEntry(const std::string &ID, const std::string &struct_type);
 
-    void addEntry(std::string ID, varType type);
+    void addEntry(const std::string &ID, varType type);
 
-    void addEntry(std::string ID, std::vector<varType> func_params, varType ret_type);
+    void addEntry(const std::string &ID, const std::vector<varType> &func_params, varType ret_type);
 
-    SymEntry getSymbolEntry(std::string ID);
+    SymEntry getSymbolEntry(const std::string &ID);
 
-    bool isSymInTable(std::string ID);
+    bool isSymInTable(const std::string &ID);
 
-    varType getSymType(std::string ID);
+    varType getSymType(const std::string &ID);
 
-    FunctionType getFunctionType(std::string ID);
+    FunctionType getFunctionType(const std::string &ID);
 
-    std::string getStructType(std::string ID);
+    std::string getStructType(const std::string &ID);
 
-    int structTypeOffset(std::string ID);
+    int structTypeOffset(const std::string &ID);
 };
 
 
