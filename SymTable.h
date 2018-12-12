@@ -8,25 +8,9 @@
 #include <string>
 #include <vector>
 #include "Exceptions.h"
-
-enum varType {
-    INTTYPE, BYTETYPE, BOOLTYPE, STRUCTTYPE, FUNCTYPE, NOTYPE
-};
+#include "StructType.h"
 
 typedef std::pair<std::vector<varType>, varType> FunctionType;
-
-struct StructType {
-    const std::string type_name;
-    const std::vector<std::pair<std::string, varType> > fields;
-
-    StructType() : type_name(std::string("")), fields(std::vector<std::pair<std::string, varType> >()) {}
-
-//    StructType(StructType &t) : type_name(std::string(t.type_name)), fields(t.fields) {}
-
-    StructType(const std::string &name, const std::vector<std::pair<std::string, varType> > &fields)
-            : type_name(std::string(name)), fields(std::vector<std::pair<std::string, varType> >(fields)) {}
-};
-
 
 struct SymEntry {
     const std::string ID;
@@ -88,10 +72,6 @@ public:
     FunctionType getFunctionType(std::string ID);
 
     std::string getStructType(std::string ID);
-
-    StructType getStructTypeEntry(std::string ID);
-
-    bool isStructTypeInTable(std::string ID);
 
     int structTypeOffset(std::string ID);
 };

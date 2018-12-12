@@ -11,11 +11,6 @@ void yyerror(const char*);
 std::vector<StructType> structs = std::vector<StructType>();
 std::vector<SymTable> tables_stack = std::vector<SymTable>(structs);
 
-void addStructType(StructType t);
-void addStructType(std::string ID, std::vector<std::pair<std::string, varType> > fields);
-
-
-
 
 struct Node{
 
@@ -172,15 +167,3 @@ Exp:                LPAREN Exp RPAREN
 
 
 %%
-
-void addStructType(StructType t) {
-    if (isStructTypeInTable(t.type_name)) {
-        throw ShadowingException(t.type_name);
-    }
-
-    structs.push_back(t);
-}
-
-void addStructType(std::string ID, std::vector<std::pair<std::string, varType> > fields) {
-    addStructType(StructType(ID, fields));
-}

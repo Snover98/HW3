@@ -69,22 +69,6 @@ void SymTable::addEntry(std::string ID, std::vector<varType> func_params, varTyp
     addEntry(SymEntry(ID, CALCOFFSET(), func_params, ret_type));
 }
 
-StructType SymTable::getStructTypeEntry(std::string ID) {
-    //find the struct type with the same ID in this table
-    for (std::vector<StructType>::iterator it = structs.begin(); it != structs.end(); ++it) {
-        if (ID.compare((*it).type_name) == 0) {
-            return (*it);
-        }
-    }
-
-    //if there is non, try the parent table, and if this table has no parent return an entry with type of NOTYPE
-    return (parent == NULL) ? StructType() : parent->getStructTypeEntry(ID);
-}
-
 int SymTable::structTypeOffset(std::string ID) {
     return getStructTypeEntry(ID).fields.size();
-}
-
-bool SymTable::isStructTypeInTable(std::string ID) {
-    return !getStructTypeEntry(ID).fields.empty();
 }
