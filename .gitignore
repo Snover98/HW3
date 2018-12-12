@@ -1,0 +1,6 @@
+hw3.pdf
+hw3-tests.zip
+selfcheck-hw3.sh
+.idea/*
+cmake-build-debug/*
+cmake-build-debug/CMakeFiles/*
