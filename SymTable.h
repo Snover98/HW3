@@ -19,9 +19,9 @@ struct StructType {
     const std::string type_name;
     const std::vector<std::pair<std::string, varType> > fields;
 
-    StructType() : type_name(""), fields(std::vector<std::pair<std::string, varType> >()){}
+    StructType() : type_name(std::string("")), fields(std::vector<std::pair<std::string, varType> >()) {}
 
-    StructType(StructType &t) : type_name(std::string(t.type_name)), fields(t.fields) {}
+//    StructType(StructType &t) : type_name(std::string(t.type_name)), fields(t.fields) {}
 
     StructType(const std::string &name, const std::vector<std::pair<std::string, varType> > &fields)
             : type_name(std::string(name)), fields(std::vector<std::pair<std::string, varType> >(fields)) {}
@@ -76,6 +76,10 @@ public:
 
     void addEntry(std::string ID, std::vector<varType> func_params, varType ret_type);
 
+    void addStructType(StructType t);
+
+    void addStructType(std::string ID, std::vector<std::pair<std::string, varType> > fields);
+
     SymEntry getSymbolEntry(std::string ID);
 
     bool isSymInTable(std::string ID);
@@ -87,6 +91,8 @@ public:
     std::string getStructType(std::string ID);
 
     StructType getStructTypeEntry(std::string ID);
+
+    bool isStructTypeInTable(std::string ID);
 
     int structTypeOffset(std::string ID);
 };
