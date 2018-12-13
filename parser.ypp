@@ -3,6 +3,7 @@
 #include <iostream>
 #include "SymTable.h"
 #include <vector>
+#include "Node.h"
 
 #define YYSTYPE Node*
 int yylex();
@@ -12,14 +13,7 @@ std::vector<StructType> structs = std::vector<StructType>();
 std::vector<SymTable> tables_stack = std::vector<SymTable>(structs);
 
 
-struct Node{
 
-};
-
-class Num : public Node{
-
-
-};
 
 %}
 
