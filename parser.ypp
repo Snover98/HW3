@@ -14,7 +14,7 @@ std::vector<StructType> structs = std::vector<StructType>();
 //stack of symbol tables
 std::vector<SymTable> tables_stack = std::vector<SymTable>(structs);
 //number of conditional scopes (if/else/while) we are in, used to validate break statements
-unsigned int num_of_cond_scopes = 0;
+unsigned int num_of_while_scopes = 0;
 
 
 
@@ -107,16 +107,16 @@ Statement:          OpenStatement
 ;
 
 OpenStatement:      IF LPAREN Exp RPAREN Statement
-                    | IF LPAREN Exp RPAREN {++num_of_cond_scopes;} ClosedStatement ELSE OpenStatement {--num_of_cond_scopes;}
-                    | WHILE LPAREN Exp RPAREN {++num_of_cond_scopes;} OpenStatement {--num_of_cond_scopes;}
+                    | IF LPAREN Exp RPAREN ClosedStatement ELSE OpenStatement
+                    | WHILE LPAREN Exp RPAREN {++num_of_while_scopes;} OpenStatement {--num_of_while_scopes;}
 ;
 
 ClosedStatement:    SimpleStatement
-                    | IF LPAREN Exp RPAREN {++num_of_cond_scopes;} ClosedStatement ELSE ClosedStatement {--num_of_cond_scopes;}
-                    | WHILE LPAREN Exp RPAREN {++num_of_cond_scopes;} ClosedStatement {--num_of_cond_scopes;}
+                    | IF LPAREN Exp RPAREN ClosedStatement ELSE ClosedStatement
+                    | WHILE LPAREN Exp RPAREN {++num_of_while_scopes;} ClosedStatement {--num_of_while_scopes;}
 ;
 
-SimpleStatement:    LBRACE {++num_of_cond_scopes;} Statements {--num_of_cond_scopes;} RBRACE
+SimpleStatement:    LBRACE Statements RBRACE
                     | Type ID SC
                     | StructType ID SC
                     | STRUCT ID LBRACE StructMemList RBRACE SC
@@ -127,8 +127,8 @@ SimpleStatement:    LBRACE {++num_of_cond_scopes;} Statements {--num_of_cond_sco
                     | Call SC
                     | RETURN SC
                     | RETURN Exp SC
-                    | BREAK SC {if(num_of_cond_scopes == 0) errorUnexpectedBreak(lineno);}
-                    | CONTINUE SC {if(num_of_cond_scopes == 0) errorUnexpectedContinue(lineno);}
+                    | BREAK SC {if(num_of_while_scopes == 0) errorUnexpectedBreak(lineno);}
+                    | CONTINUE SC {if(num_of_while_scopes == 0) errorUnexpectedContinue(lineno);}
 ;
 
 Call:               ID LPAREN ExpList RPAREN
@@ -151,14 +151,26 @@ Exp:                LPAREN Exp RPAREN
                     | ID
                     | ID PERIOD ID
                     | Call
-                    | NUM
-                    | NUM B
-                    | STRING
-                    | TRUE
-                    | FALSE
-                    | NOT Exp
-                    | Exp AND Exp
-                    | Exp OR Exp
+                    | NUM {$$ = new Expression(INTEXP);}
+                    | NUM B {
+                                //make sure that the byte value is <= 255
+                                $$ = new Expression(BYTEEXP);
+                            }
+                    | STRING {$$ = new Expression(STRINGEXP);}
+                    | TRUE {$$ = new Expression(BOOLEXP);}
+                    | FALSE {$$ = new Expression(BOOLEXP);}
+                    | NOT Exp {
+                                if($1->exp_type != BOOLEXP) errorMismatch(lineno);
+                                $$ = $1;
+                              }
+                    | Exp AND Exp {
+                                    if($1->exp_type != BOOLEXP || $3->exp_type != BOOLEXP) errorMismatch(lineno);
+                                    $$ = $1;
+                                  }
+                    | Exp OR Exp {
+                                    if($1->exp_type != BOOLEXP || $3->exp_type != BOOLEXP) errorMismatch(lineno);
+                                    $$ = $1;
+                                 }
                     | Exp RELOP Exp
 ;
 
