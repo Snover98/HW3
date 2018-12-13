@@ -107,16 +107,16 @@ Statement:          OpenStatement
 ;
 
 OpenStatement:      IF LPAREN Exp RPAREN Statement
-                    | IF LPAREN Exp RPAREN ClosedStatement ELSE OpenStatement
-                    | WHILE LPAREN Exp RPAREN OpenStatement
+                    | IF LPAREN Exp RPAREN {++num_of_cond_scopes;} ClosedStatement ELSE OpenStatement {--num_of_cond_scopes;}
+                    | WHILE LPAREN Exp RPAREN {++num_of_cond_scopes;} OpenStatement {--num_of_cond_scopes;}
 ;
 
 ClosedStatement:    SimpleStatement
-                    | IF LPAREN Exp RPAREN ClosedStatement ELSE ClosedStatement
-                    | WHILE LPAREN Exp RPAREN ClosedStatement
+                    | IF LPAREN Exp RPAREN {++num_of_cond_scopes;} ClosedStatement ELSE ClosedStatement {--num_of_cond_scopes;}
+                    | WHILE LPAREN Exp RPAREN {++num_of_cond_scopes;} ClosedStatement {--num_of_cond_scopes;}
 ;
 
-SimpleStatement:    LBRACE Statements RBRACE
+SimpleStatement:    LBRACE {++num_of_cond_scopes;} Statements {--num_of_cond_scopes;} RBRACE
                     | Type ID SC
                     | StructType ID SC
                     | STRUCT ID LBRACE StructMemList RBRACE SC
@@ -127,8 +127,8 @@ SimpleStatement:    LBRACE Statements RBRACE
                     | Call SC
                     | RETURN SC
                     | RETURN Exp SC
-                    | BREAK SC
-                    | CONTINUE SC
+                    | BREAK SC {if(num_of_cond_scopes == 0) errorUnexpectedBreak(lineno);}
+                    | CONTINUE SC {if(num_of_cond_scopes == 0) errorUnexpectedContinue(lineno);}
 ;
 
 Call:               ID LPAREN ExpList RPAREN
