@@ -10,7 +10,7 @@ int yylex();
 void yyerror(const char*);
 
 //the struct types defined in the code
-std::vector<StructType> structs = std::vector<StructType>();
+std::vector<StructType> structs();
 //stack of symbol tables
 std::vector<SymTable> tables_stack = std::vector<SymTable>(structs);
 //number of conditional scopes (if/else/while) we are in, used to validate break statements
@@ -55,11 +55,6 @@ unsigned int num_of_while_scopes = 0;
 
 
 
-
-
-
-
-
 %%
 
 Program:            Structs Funcs;
@@ -74,7 +69,11 @@ Structs:            /*epsilon*/
                     | StructsDecl Structs
 ;
 
-StructsDecl:        STRUCT ID LBRACE StructMemList RBRACE SC;
+StructsDecl:        STRUCT ID LBRACE StructMemList RBRACE SC {
+
+//TODO: something like this: addStructType(structs, StructType(((Identifier&)$2)->ID, (some cast&) $4->fields));
+
+};
 
 RetType:            Type
                     | VOID

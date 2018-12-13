@@ -49,7 +49,7 @@ private:
 
 
 public:
-    SymTable(const std::vector<StructType> &structs, int offset = 0, SymTable *parent = NULL) : table_offset(offset),
+    SymTable(const std::vector<StructType> &structs, int offset = 0, SymTable *parent = nullptr) : table_offset(offset),
                                                                                                 scope_entries(
                                                                                                         std::vector<SymEntry>()),
                                                                                                 parent(parent),

@@ -13,16 +13,17 @@ enum varType {
     INTTYPE, BYTETYPE, BOOLTYPE, STRUCTTYPE, FUNCTYPE, NOTYPE
 };
 
+typedef std::vector<std::pair<std::string, varType> > StructFieldsType;
+
 struct StructType {
     const std::string type_name;
-    const std::vector<std::pair<std::string, varType> > fields;
+    const StructFieldsType fields;
 
-    StructType() : type_name(std::string("")), fields(std::vector<std::pair<std::string, varType> >()) {}
+    StructType() {}
 
 //    StructType(StructType &t) : type_name(std::string(t.type_name)), fields(t.fields) {}
 
-    StructType(const std::string &name, const std::vector<std::pair<std::string, varType> > &fields)
-            : type_name(std::string(name)), fields(std::vector<std::pair<std::string, varType> >(fields)) {}
+    StructType(const std::string& name, const StructFieldsType& fields) : type_name(name), fields(fields) {}
 };
 
 void addStructType(std::vector<StructType> &structs, StructType t);
