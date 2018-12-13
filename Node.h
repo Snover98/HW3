@@ -38,4 +38,17 @@ struct Identifier : public Node{
     Identifier(const std::string &ID) : Node(), ID(ID) {}
 };
 
+//checks if an expression is a number
+inline bool isNumExp(Expression* e){
+    return (e->exp_type == INTEXP || e->exp_type == BYTEEXP);
+}
+
+//returns the type of a binary operator between nums (like +,-,/,*)
+inline ExpType operatorType(Expression* num1, Expression* num2){
+    return ((num1->exp_type == INTEXP || num2->exp_type == INTEXP) ? INTEXP : BYTEEXP);
+}
+
+
+
+
 #endif //HW3_NODE_H
