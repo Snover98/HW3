@@ -7,26 +7,31 @@
 
 #include <string>
 
+//the type of the expression
 enum ExpType {
     INTEXP, BYTEEXP, BOOLEXP, STRUCTEXP, FUNCEXP, STRINGEXP
 };
 
+//general type for lex output
 struct Node {
 
 };
 
+//struct for expressions, we need to know their type
 struct Expression : public Node {
     const ExpType exp_type;
 
     Expression(const ExpType exp_type) : Node(), exp_type(exp_type) {}
 };
 
+//struct for structures, the extra string field is so we can now what kind of struct it is
 struct Structure : public Expression {
     const std::string struct_type;
 
     Structure(const std::string &struct_type) : Expression(STRUCTEXP), struct_type(struct_type) {}
 };
 
+//used when there is an identifier read by lex, only used to create the relevant Expression and than deleted
 struct Identifier : public Node{
     const std::string ID;
 

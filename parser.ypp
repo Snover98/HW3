@@ -9,8 +9,12 @@
 int yylex();
 void yyerror(const char*);
 
+//the struct types defined in the code
 std::vector<StructType> structs = std::vector<StructType>();
+//stack of symbol tables
 std::vector<SymTable> tables_stack = std::vector<SymTable>(structs);
+//number of conditional scopes (if/else/while) we are in, used to validate break statements
+unsigned int num_of_cond_scopes = 0;
 
 
 
