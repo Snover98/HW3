@@ -36,6 +36,9 @@ struct SymEntry {
                                                                                                                      FunctionType(
                                                                                                                              func_params,
                                                                                                                              ret_type)) {}
+    bool isVariable(){
+        return (type == BOOLTYPE || type == BYTETYPE || type == INTTYPE || type == StructType);
+    }
 };
 
 class SymTable {
