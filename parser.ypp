@@ -138,8 +138,14 @@ Call:               ID LPAREN ExpList RPAREN
                     | ID LPAREN RPAREN
 ;
 
-ExpList:            Exp
-                    | Exp COMMA ExpList
+ExpList:            Exp {
+                            $$ = new ExpressionList();
+                            $$->expressions.push_back(*($1));
+                        }
+                    | Exp COMMA ExpList {
+                                            $$ = $3;
+                                            $$->expressions.push_back(*($1));
+                                        }
 ;
 
 Type:               INT {$$ = new Expression(INTEXP)}

@@ -6,6 +6,7 @@
 #define HW3_NODE_H
 
 #include <string>
+#include <vector>
 
 //the type of the expression
 enum ExpType {
@@ -36,6 +37,12 @@ struct Identifier : public Node{
     const std::string ID;
 
     Identifier(const std::string &ID) : Node(), ID(ID) {}
+};
+
+struct ExpressionList : public Node{
+    std::vector<Expression> expressions;
+
+    ExpressionList() : Node(), expressions(std::vector<Expression>()){}
 };
 
 //checks if an expression is a number
