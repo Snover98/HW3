@@ -171,7 +171,11 @@ Exp:                LPAREN Exp RPAREN {$$ = $2;}
                     | ID {
                             SymEntry e = getSymbolEntry($1->ID);
                             if(!isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
-                            $$ = new Expression(varToExp(e.type));
+                            if(e.type == STRUCTEXP){
+                                $$ = new Structure(e.struct_type);
+                            } else {
+                                $$ = new Expression(varToExp(e.type));
+                            }
                             delete $1;
                          }
                     | ID PERIOD ID {
