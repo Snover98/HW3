@@ -31,3 +31,17 @@ StructType getStructTypeEntry(const std::vector<StructType> &structs, const std:
     //if there is non, return an empty entry with type of NOTYPE
     return StructType(); //TODO: Not a bug! the grammar does not allow structs without fields
 }
+
+varType StructType::getFieldType(const std::string& field_name){
+    //find the field with the inputted name
+    for(StructFieldsType::const_iterator it = fields.begin(); it != fields.end(); ++it){
+        if(field_name.compare((*it).first) == 0){
+            return (*it).second;
+        }
+    }
+
+    //if there is now field with that name
+    return NOTYPE;
+}
+
+

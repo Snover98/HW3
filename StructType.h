@@ -24,6 +24,8 @@ struct StructType {
 //    StructType(StructType &t) : type_name(std::string(t.type_name)), fields(t.fields) {}
 
     StructType(const std::string& name, const StructFieldsType& fields) : type_name(name), fields(fields) {}
+
+    varType getFieldType(const std::string& field_name);
 };
 
 void addStructType(std::vector<StructType> &structs, StructType t);
