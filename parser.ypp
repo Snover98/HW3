@@ -9,6 +9,10 @@
 int yylex();
 void yyerror(const char*);
 
+//function for enum type conversion
+ExpType varToExp(varType t);
+
+
 //the struct types defined in the code
 std::vector<StructType> structs();
 //stack of symbol tables
@@ -145,11 +149,27 @@ Type:               INT
 
 StructType:         STRUCT ID;
 
-Exp:                LPAREN Exp RPAREN
-                    | Exp BINOP Exp
-                    | ID
-                    | ID PERIOD ID
-                    | Call
+Exp:                LPAREN Exp RPAREN {$$ = $2;}
+                    | Exp BINOP Exp {
+                                        if(!isNumExp($1) || !isNumExp($3)) errorMismatch(lineno);
+                                        $$ = new Expression(operatorType($1, $3));
+                                    }
+                    | ID {
+                            SymEntry e = getSymbolEntry($1->ID);
+                            if(!isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
+                            $$ = new Expression(varToExp(e.type));
+                         }
+                    | ID PERIOD ID {
+                                        SymEntry e = getSymbolEntry($1->ID);
+                                        if(!isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
+                                        if(e.type != STRUCTTYPE) errorMismatch(lineno);
+                                        if(!isStructTypeInTable(structs, e.struct_type)) errorUndefStruct(lineno, e.struct_type);
+                                        StructType t = getStructTypeEntry(structs, e.struct_type);
+                                        varType field_type = t.getFieldType($3->ID);
+                                        if(field_type == NOTYPE) errorUndefStructMember(lineno, $3->ID);
+                                        $$ = new Expression(varToExp(field_type));
+                                   }
+                    | Call {$$ = $1;}
                     | NUM {$$ = new Expression(INTEXP);}
                     | NUM B {
                                 //make sure that the byte value is <= 255
@@ -160,19 +180,53 @@ Exp:                LPAREN Exp RPAREN
                     | FALSE {$$ = new Expression(BOOLEXP);}
                     | NOT Exp {
                                 if($1->exp_type != BOOLEXP) errorMismatch(lineno);
-                                $$ = $1;
+                                $$ = new Expression(BOOLEXP);
                               }
                     | Exp AND Exp {
                                     if($1->exp_type != BOOLEXP || $3->exp_type != BOOLEXP) errorMismatch(lineno);
-                                    $$ = $1;
+                                    $$ = new Expression(BOOLEXP);
                                   }
                     | Exp OR Exp {
                                     if($1->exp_type != BOOLEXP || $3->exp_type != BOOLEXP) errorMismatch(lineno);
-                                    $$ = $1;
+                                    $$ = new Expression(BOOLEXP);
                                  }
-                    | Exp RELOP Exp
+                    | Exp RELOP Exp {
+                                        if(!isNumExp($1) || !isNumExp($3)) errorMismatch(lineno);
+                                        $$ = new Expression(BOOLEXP);
+                                    }
 ;
 
 
 
 %%
+
+ExpType varToExp(varType t){
+    switch(t){
+        case INTTYPE:
+            return INTEXP;
+        case BYTETYPE:
+            return BYTEEXP;
+        case BOOLTYPE:
+            return BOOLEXP;
+        case STRUCTTYPE:
+            return STRUCTEXP;
+        case FUNCTYPE:
+            return FUNCEXP;
+        default:
+            //note that no entry in the symbol table can be string or void!
+            return VOIDEXP;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
