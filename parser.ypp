@@ -142,9 +142,9 @@ ExpList:            Exp
                     | Exp COMMA ExpList
 ;
 
-Type:               INT
-                    | BYTE
-                    | BOOL
+Type:               INT {$$ = new Expression(INTEXP)}
+                    | BYTE {$$ = new Expression(BYTEEXP)}
+                    | BOOL {$$ = new Expression(BOOLEXP)}
 ;
 
 StructType:         STRUCT ID;
