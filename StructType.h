@@ -19,7 +19,7 @@ struct StructType {
     const std::string type_name;
     const StructFieldsType fields;
 
-    StructType() {}
+    StructType() : type_name(std::string("")), fields(StructFieldsType()) {}
 
 //    StructType(StructType &t) : type_name(std::string(t.type_name)), fields(t.fields) {}
 

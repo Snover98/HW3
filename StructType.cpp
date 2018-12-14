@@ -29,6 +29,5 @@ StructType getStructTypeEntry(const std::vector<StructType> &structs, const std:
     }
 
     //if there is non, return an empty entry with type of NOTYPE
-    return StructType(); //TODO: THIS IS A BUG! What if the user defined an empty struct? The correct thing to do:
-    //TODO return an iterator into the structs vector. If not found, return structs.end() - this is the convention in cpp.
+    return StructType(); //TODO: Not a bug! the grammar does not allow structs without fields
 }
