@@ -37,7 +37,7 @@ struct SymEntry {
                                                                                                                              func_params,
                                                                                                                              ret_type)) {}
     bool isVariable(){
-        return (type == BOOLTYPE || type == BYTETYPE || type == INTTYPE || type == StructType);
+        return (type == BOOLTYPE || type == BYTETYPE || type == INTTYPE || type == STRUCTTYPE);
     }
 };
 
