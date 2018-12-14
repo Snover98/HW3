@@ -147,7 +147,10 @@ Type:               INT {$$ = new Expression(INTEXP)}
                     | BOOL {$$ = new Expression(BOOLEXP)}
 ;
 
-StructType:         STRUCT ID;
+StructType:         STRUCT ID {
+                        if(!isStructTypeInTable(structs, $2->ID)) errorUndefStruct(lineno, e.struct_type);
+                        $$ = new Structure($2->ID);
+                    };
 
 Exp:                LPAREN Exp RPAREN {$$ = $2;}
                     | Exp BINOP Exp {
