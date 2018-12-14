@@ -172,7 +172,7 @@ Exp:                LPAREN Exp RPAREN {$$ = $2;}
                     | Call {$$ = $1;}
                     | NUM {$$ = new Expression(INTEXP);}
                     | NUM B {
-                                //make sure that the byte value is <= 255
+                                //@TODO make sure that the byte value is <= 255
                                 $$ = new Expression(BYTEEXP);
                             }
                     | STRING {$$ = new Expression(STRINGEXP);}
