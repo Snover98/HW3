@@ -9,7 +9,7 @@
 
 //the type of the expression
 enum ExpType {
-    INTEXP, BYTEEXP, BOOLEXP, STRUCTEXP, FUNCEXP, STRINGEXP
+    INTEXP, BYTEEXP, BOOLEXP, STRUCTEXP, FUNCEXP, STRINGEXP, VOIDEXP
 };
 
 //general type for lex output
