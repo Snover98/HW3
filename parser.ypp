@@ -134,8 +134,36 @@ SimpleStatement:    LBRACE Statements RBRACE
                     | CONTINUE SC {if(num_of_while_scopes == 0) errorUnexpectedContinue(lineno);}
 ;
 
-Call:               ID LPAREN ExpList RPAREN
-                    | ID LPAREN RPAREN
+Call:               ID LPAREN ExpList RPAREN {
+                                                    SymEntry func_e = getSymbolEntry($1->ID);
+                                                    if(!isSymInTable($1->ID) || !e.isVariable()) errorUndefFunc(lineno, $1->ID);
+                                                    if(e.type != FUNCTYPE) errorUndefFunc(lineno, $1->ID);
+                                                    //@TODO use errorPrototypeMismatch correctly
+                                                    if($3->expressions.size() != func_e.func_type.first.size()) errorPrototypeMismatch();
+
+                                                    std::vector<Expression>::iterator it_exp = = $3->expressions.begin();
+                                                    std::vector<varType>::iterator it_arg = = func_e.func_type.first.begin();
+                                                    for(; it_exp != $3->expressions.end() && it_arg != func_e.func_type.first.end(); ++it_exp && ++it_arg ){
+                                                        //@TODO use errorPrototypeMismatch correctly
+                                                        if((*it_exp).exp_type != varToExp((*it_arg))) errorPrototypeMismatch();
+                                                        //@TODO make it possible to compare the specific struct types
+                                                        if(*it_arg == STRUCTTYPE && !STRUCT_TYPES_EQUAL) errorPrototypeMismatch();
+                                                    }
+
+                                                    $$ = new Expression(varToExp(func_e.func_type.second));
+                                                    delete $1;
+                                                    delete $3;
+                                             }
+                    | ID LPAREN RPAREN {
+                                            SymEntry func_e = getSymbolEntry($1->ID);
+                                            if(!isSymInTable($1->ID) || !e.isVariable()) errorUndefFunc(lineno, $1->ID);
+                                            if(e.type != FUNCTYPE) errorUndefFunc(lineno, $1->ID);
+                                            //@TODO use errorPrototypeMismatch correctly
+                                            if(!func_e.func_type.first.empty()) errorPrototypeMismatch();
+
+                                            $$ = new Expression(varToExp(func_e.func_type.second));
+                                            delete $1;
+                                       }
 ;
 
 ExpList:            Exp {
