@@ -138,20 +138,20 @@ ClosedStatement:    SimpleStatement
 
 SimpleStatement:    LBRACE Statements RBRACE
                     | Type ID SC {
-                                    if(tables_stack.back().isSymInTable($2->ID)) errorDef(lineno, $2->ID);
+                                    if(tables_stack.isSymInTable($2->ID)) errorDef(lineno, $2->ID);
                                     tables_stack.back().addEntry($2->ID, expToVar($1->exp_type));
                                     delete $1;
                                     delete $2;
                                  }
                     | StructType ID SC {
-                                        if(tables_stack.back().isSymInTable($2->ID)) errorDef(lineno, $2->ID);
+                                        if(tables_stack.isSymInTable($2->ID)) errorDef(lineno, $2->ID);
                                         tables_stack.back().addEntry($2->ID, $1->struct_type);
                                         delete $1;
                                         delete $2;
                                        }
                     | STRUCT ID LBRACE StructMemList RBRACE SC
                     | Type ID ASSIGN Exp SC {
-                                                if(tables_stack.back().isSymInTable($2->ID)) errorDef(lineno, $2->ID);
+                                                if(tables_stack.isSymInTable($2->ID)) errorDef(lineno, $2->ID);
                                                 if(!isLegalExpType($1, $4)) errorMismatch(lineno);
                                                 tables_stack.back().addEntry($2->ID, expToVar($1->exp_type));
                                                 delete $1;
@@ -159,7 +159,7 @@ SimpleStatement:    LBRACE Statements RBRACE
                                                 delete $4;
                                             }
                     | StructType ID ASSIGN Exp SC {
-                                                    if(tables_stack.back().isSymInTable($2->ID)) errorDef(lineno, $2->ID);
+                                                    if(tables_stack.isSymInTable($2->ID)) errorDef(lineno, $2->ID);
                                                     if(!isLegalExpType($1, $4)) errorMismatch(lineno);
                                                     tables_stack.back().addEntry($2->ID, $1->struct_type);
                                                     delete $1;
@@ -168,7 +168,7 @@ SimpleStatement:    LBRACE Statements RBRACE
                                                   }
                     | ID ASSIGN Exp SC {
                                             SymEntry e = getSymbolEntry($1->ID);
-                                            if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
+                                            if(!tables_stack.isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
                                             if(e.type == STRUCTTYPE){
                                                 if(!isLegalExpType($3, e.struct_type)) errorMismatch(lineno);
                                             } else {
@@ -179,7 +179,7 @@ SimpleStatement:    LBRACE Statements RBRACE
                                        }
                     | ID PERIOD ID ASSIGN Exp SC {
                                                     SymEntry e = getSymbolEntry($1->ID);
-                                                    if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
+                                                    if(!tables_stack.isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
                                                     if(e.type != STRUCTTYPE) errorMismatch(lineno);
                                                     if(!isStructTypeInTable(structs_stack, e.struct_type)) errorUndefStruct(lineno, e.struct_type);
                                                     StructType t = getStructTypeEntry(structs_stack, e.struct_type);
@@ -202,7 +202,7 @@ SimpleStatement:    LBRACE Statements RBRACE
 
 Call:               ID LPAREN ExpList RPAREN {
                                                     SymEntry func_e = getSymbolEntry($1->ID);
-                                                    if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndefFunc(lineno, $1->ID);
+                                                    if(!tables_stack.isSymInTable($1->ID) || !e.isVariable()) errorUndefFunc(lineno, $1->ID);
                                                     if(e.type != FUNCTYPE) errorUndefFunc(lineno, $1->ID);
                                                     //@TODO use errorPrototypeMismatch correctly
                                                     if($3->expressions.size() != func_e.func_type.first.size()) errorPrototypeMismatch();
@@ -222,7 +222,7 @@ Call:               ID LPAREN ExpList RPAREN {
                                              }
                     | ID LPAREN RPAREN {
                                             SymEntry func_e = getSymbolEntry($1->ID);
-                                            if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndefFunc(lineno, $1->ID);
+                                            if(!tables_stack.isSymInTable($1->ID) || !e.isVariable()) errorUndefFunc(lineno, $1->ID);
                                             if(e.type != FUNCTYPE) errorUndefFunc(lineno, $1->ID);
                                             //@TODO use errorPrototypeMismatch correctly
                                             if(!func_e.func_type.first.empty()) errorPrototypeMismatch();
@@ -264,7 +264,7 @@ Exp:                LPAREN Exp RPAREN {$$ = $2;}
                                     }
                     | ID {
                             SymEntry e = getSymbolEntry($1->ID);
-                            if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
+                            if(!tables_stack.isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
                             if(e.type == STRUCTEXP){
                                 $$ = new Structure(e.struct_type);
                             } else {
@@ -274,7 +274,7 @@ Exp:                LPAREN Exp RPAREN {$$ = $2;}
                          }
                     | ID PERIOD ID {
                                         SymEntry e = getSymbolEntry($1->ID);
-                                        if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
+                                        if(!tables_stack.isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
                                         if(e.type != STRUCTTYPE) errorMismatch(lineno);
                                         if(!isStructTypeInTable(structs_stack, e.struct_type)) errorUndefStruct(lineno, e.struct_type);
                                         StructType t = getStructTypeEntry(structs_stack, e.struct_type);
