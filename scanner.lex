@@ -62,17 +62,21 @@ continue							return CONTINUE;
 
 \+|\-|\*|\/							return BINOP;
 
-[a-zA-Z][a-zA-Z0-9]*				return ID;
+[a-zA-Z][a-zA-Z0-9]*				{
+                                        yylval=new Identifier();
+                                        (Identifier*)yyval->ID=std::string(yytext);
+                                        return ID;
+                                    }
 
 0|([1-9][0-9]*)						return NUM;
 
-\"([^\n\r\"\\]|\\[rnt"\\])+\"			return STRING;
+\"([^\n\r\"\\]|\\[rnt"\\])+\"		return STRING;
 
-[^\r\n]*[ \r|\n|\r\n]?			;
+\/\/[^\r\n]*[ \r|\n|\r\n]?			;
 
 [ \t\r\n]							;
 
-.									return ERROR;
+.                                   {output::errorLex(yylineno);exit(0);}
 
 %%
 
