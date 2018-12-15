@@ -28,20 +28,41 @@ StructType getStructTypeEntry(const std::vector<StructType> &structs, const std:
         }
     }
 
-    //if there is non, return an empty entry with type of NOTYPE
-    return StructType(); //TODO: Not a bug! the grammar does not allow structs without fields
+    //if there is non, return an empty structs with no fields
+    return StructType();
 }
 
-varType StructType::getFieldType(const std::string& field_name){
+varType StructType::getFieldType(const std::string &field_name) {
     //find the field with the inputted name
-    for(StructFieldsType::const_iterator it = fields.begin(); it != fields.end(); ++it){
-        if(field_name == (*it).first){
+    for (StructFieldsType::const_iterator it = fields.begin(); it != fields.end(); ++it) {
+        if (field_name == (*it).first) {
             return (*it).second;
         }
     }
 
     //if there is now field with that name
     return NOTYPE;
+}
+
+bool isStructTypeInTable(const std::vector<std::vector<StructType> > &structs_stack, const std::string &ID) {
+    return !getStructTypeEntry(structs_stack, ID).fields.empty();
+}
+
+
+StructType getStructTypeEntry(const std::vector<std::vector<StructType> > &structs_stack, const std::string &ID) {
+    //look for an entry in each scope
+    for (std::vector<std::vector<StructType> >::const_iterator it = structs_stack.begin(); it != structs_stack.end(); ++it) {
+        //look for the struct type in the current scope
+        StructType res = getStructTypeEntry(*it, ID);
+
+        //if the result is not the default
+        if (!res.fields.empty()) {
+            return res;
+        }
+    }
+
+    //if there is non, return an empty structs with no fields
+    return StructType();
 }
 
 

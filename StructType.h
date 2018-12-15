@@ -35,7 +35,11 @@ void addStructType(std::vector<StructType> &structs, const std::string &ID,
 
 bool isStructTypeInTable(const std::vector<StructType> &structs, const std::string &ID);
 
+bool isStructTypeInTable(const std::vector<std::vector<StructType> > &structs_stack, const std::string &ID);
+
 StructType getStructTypeEntry(const std::vector<StructType> &structs, const std::string &ID);
+
+StructType getStructTypeEntry(const std::vector<std::vector<StructType> > &structs_stack, const std::string &ID);
 
 
 #endif //HW3_STRUCTTYPE_H
