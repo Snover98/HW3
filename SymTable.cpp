@@ -23,7 +23,7 @@ int SymTable::typeOffset(SymEntry entry) {
 SymEntry SymTable::getSymbolEntry(const std::string &ID) {
     //find the entry with the same ID in this table
     for (std::vector<SymEntry>::iterator it = scope_entries.begin(); it != scope_entries.end(); ++it) {
-        if (ID.compare((*it).ID) == 0) {
+        if (ID == (*it).ID) {
             return (*it);
         }
     }

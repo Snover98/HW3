@@ -23,7 +23,7 @@ bool isStructTypeInTable(const std::vector<StructType> &structs, const std::stri
 StructType getStructTypeEntry(const std::vector<StructType> &structs, const std::string &ID) {
     //find the struct type with the same ID in this table
     for (std::vector<StructType>::const_iterator it = structs.begin(); it != structs.end(); ++it) {
-        if (ID.compare((*it).type_name) == 0) {
+        if (ID == (*it).type_name) {
             return (*it);
         }
     }
