@@ -77,5 +77,15 @@ bool isLegalExpType(Expression* actual, std::string &expected){
     return isLegalExpType(actual, &s);
 }
 
+bool isLegalExpType(ExpType actual, ExpType expected){
+    Expression e = Expression(actual);
+    return isLegalExpType(&e, expected);
+}
+
+bool isLegalExpType(std::string &actual, std::string &expected){
+    Structure s = Structure(actual);
+    return isLegalExpType(&s, expected);
+}
+
 
 #endif //HW3_NODE_H
