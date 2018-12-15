@@ -15,9 +15,10 @@ VarType expToVar(ExpType e);
 
 
 //the struct types defined in the code
-std::vector<StructType> structs();
+std::vector<<std::vector<StructType> > structs_stack();
+structs_stack.push_back(<std::vector<StructType>());
 //stack of symbol tables
-std::vector<SymTable> tables_stack = std::vector<SymTable>(structs);
+std::vector<SymTable> tables_stack = std::vector<SymTable>(structs_stack.back());
 //number of conditional scopes (if/else/while) we are in, used to validate break statements
 unsigned int num_of_while_scopes = 0;
 //var fo knowing what type the current function returns
@@ -78,7 +79,7 @@ Structs:            /*epsilon*/
 
 StructsDecl:        STRUCT ID LBRACE StructMemList RBRACE SC {
 
-//TODO: something like this: addStructType(structs, StructType(((Identifier&)$2)->ID, (some cast&) $4->fields));
+//TODO: something like this: addStructType(structs_stack.back(), StructType(((Identifier&)$2)->ID, (some cast&) $4->fields));
 
 };
 
@@ -98,11 +99,24 @@ FormalDecl:         Type ID
                     | StructType ID
 ;
 
-StructMemList:      StructMem
-                    | StructMem StructMemList
+StructMemList:      StructMem {
+                                $$ = new StructMemList();
+                                $$->fields.push_back($1->field);
+                                delete $1;
+                              }
+                    | StructMem StructMemList {
+                                                $$ = $2;
+                                                if($$->isFieldNameTaken($1->field.first)) errorDef(lineno, $1->field.first);
+                                                $$->fields.push_back($1->field);
+                                                delete $1;
+                                              }
 ;
 
-StructMem:          Type ID SC;
+StructMem:          Type ID SC {
+                                    $$ = new StructMemory($2->ID, expToVar($2->exp_type));
+                                    delete $1;
+                                    delete $2;
+                               };
 
 Statements:         Statement
                     | Statements Statement
@@ -167,8 +181,8 @@ SimpleStatement:    LBRACE Statements RBRACE
                                                     SymEntry e = getSymbolEntry($1->ID);
                                                     if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
                                                     if(e.type != STRUCTTYPE) errorMismatch(lineno);
-                                                    if(!isStructTypeInTable(structs, e.struct_type)) errorUndefStruct(lineno, e.struct_type);
-                                                    StructType t = getStructTypeEntry(structs, e.struct_type);
+                                                    if(!isStructTypeInTable(structs_stack, e.struct_type)) errorUndefStruct(lineno, e.struct_type);
+                                                    StructType t = getStructTypeEntry(structs_stack, e.struct_type);
                                                     varType field_type = t.getFieldType($3->ID);
                                                     if(field_type == NOTYPE) errorUndefStructMember(lineno, $3->ID);
                                                     if(!isLegalExpType($5, varToExp(field_type))) errorMismatch(lineno);
@@ -236,7 +250,7 @@ Type:               INT {$$ = new Expression(INTEXP);}
 ;
 
 StructType:         STRUCT ID {
-                        if(!isStructTypeInTable(structs, $2->ID)) errorUndefStruct(lineno, e.struct_type);
+                        if(!isStructTypeInTable(structs_stack, $2->ID)) errorUndefStruct(lineno, e.struct_type);
                         $$ = new Structure($2->ID);
                         delete $2;
                     };
@@ -262,8 +276,8 @@ Exp:                LPAREN Exp RPAREN {$$ = $2;}
                                         SymEntry e = getSymbolEntry($1->ID);
                                         if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
                                         if(e.type != STRUCTTYPE) errorMismatch(lineno);
-                                        if(!isStructTypeInTable(structs, e.struct_type)) errorUndefStruct(lineno, e.struct_type);
-                                        StructType t = getStructTypeEntry(structs, e.struct_type);
+                                        if(!isStructTypeInTable(structs_stack, e.struct_type)) errorUndefStruct(lineno, e.struct_type);
+                                        StructType t = getStructTypeEntry(structs_stack, e.struct_type);
                                         varType field_type = t.getFieldType($3->ID);
                                         if(field_type == NOTYPE) errorUndefStructMember(lineno, $3->ID);
                                         $$ = new Expression(varToExp(field_type));
