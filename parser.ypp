@@ -127,11 +127,36 @@ SimpleStatement:    LBRACE Statements RBRACE
                     | STRUCT ID LBRACE StructMemList RBRACE SC
                     | Type ID ASSIGN Exp SC
                     | StructType ID ASSIGN Exp SC
-                    | ID ASSIGN Exp SC
-                    | ID PERIOD ID ASSIGN Exp SC
+                    | ID ASSIGN Exp SC {
+                                            SymEntry e = getSymbolEntry($1->ID);
+                                            if(!isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
+                                            if(e.type == STRUCTTYPE){
+                                                if(!isLegalExpType($3, e.struct_type)) errorMismatch(lineno);
+                                            } else {
+                                                if(!isLegalExpType($3, varToExp(e.type))) errorMismatch(lineno);
+                                            }
+                                            delete $1;
+                                            delete $3;
+                                       }
+                    | ID PERIOD ID ASSIGN Exp SC {
+                                                    SymEntry e = getSymbolEntry($1->ID);
+                                                    if(!isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
+                                                    if(e.type != STRUCTTYPE) errorMismatch(lineno);
+                                                    if(!isStructTypeInTable(structs, e.struct_type)) errorUndefStruct(lineno, e.struct_type);
+                                                    StructType t = getStructTypeEntry(structs, e.struct_type);
+                                                    varType field_type = t.getFieldType($3->ID);
+                                                    if(field_type == NOTYPE) errorUndefStructMember(lineno, $3->ID);
+                                                    if(!isLegalExpType($5, varToExp(field_type))) errorMismatch(lineno);
+                                                    delete $1;
+                                                    delete $3;
+                                                    delete $5;
+                                                 }
                     | Call SC
                     | RETURN SC {if(cur_ret_type != VOIDEXP) errorMismatch(lineno);}
-                    | RETURN Exp SC {if(!isLegalExpType($2, cur_ret_type)) errorMismatch(lineno);}
+                    | RETURN Exp SC {
+                                        if(!isLegalExpType($2, cur_ret_type)) errorMismatch(lineno);
+                                        delete $2;
+                                    }
                     | BREAK SC {if(num_of_while_scopes == 0) errorUnexpectedBreak(lineno);}
                     | CONTINUE SC {if(num_of_while_scopes == 0) errorUnexpectedContinue(lineno);}
 ;
