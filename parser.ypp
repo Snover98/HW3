@@ -9,8 +9,9 @@
 int yylex();
 void yyerror(const char*);
 
-//function for enum type conversion
+//functions for enum type conversions
 ExpType varToExp(varType t);
+VarType expToVar(ExpType e);
 
 
 //the struct types defined in the code
@@ -125,11 +126,26 @@ SimpleStatement:    LBRACE Statements RBRACE
                     | Type ID SC
                     | StructType ID SC
                     | STRUCT ID LBRACE StructMemList RBRACE SC
-                    | Type ID ASSIGN Exp SC
-                    | StructType ID ASSIGN Exp SC
+                    | Type ID ASSIGN Exp SC {
+                                                if(tables_stack.back().isSymInTable($2->ID)) errorDef(lineno, $2->ID);
+                                                if(!isLegalExpType($1, $4)) errorMismatch(lineno);
+                                                tables_stack.back().addEntry($2->ID, expToVar($1->exp_type));
+                                                delete $1;
+                                                delete $2;
+                                                delete $4;
+
+                                            }
+                    | StructType ID ASSIGN Exp SC {
+                                                    if(tables_stack.back().isSymInTable($2->ID)) errorDef(lineno, $2->ID);
+                                                    if(!isLegalExpType($1, $4)) errorMismatch(lineno);
+                                                    tables_stack.back().addEntry($2->ID, $1->struct_type);
+                                                    delete $1;
+                                                    delete $2;
+                                                    delete $4;
+                                                  }
                     | ID ASSIGN Exp SC {
                                             SymEntry e = getSymbolEntry($1->ID);
-                                            if(!isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
+                                            if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
                                             if(e.type == STRUCTTYPE){
                                                 if(!isLegalExpType($3, e.struct_type)) errorMismatch(lineno);
                                             } else {
@@ -140,7 +156,7 @@ SimpleStatement:    LBRACE Statements RBRACE
                                        }
                     | ID PERIOD ID ASSIGN Exp SC {
                                                     SymEntry e = getSymbolEntry($1->ID);
-                                                    if(!isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
+                                                    if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
                                                     if(e.type != STRUCTTYPE) errorMismatch(lineno);
                                                     if(!isStructTypeInTable(structs, e.struct_type)) errorUndefStruct(lineno, e.struct_type);
                                                     StructType t = getStructTypeEntry(structs, e.struct_type);
@@ -163,7 +179,7 @@ SimpleStatement:    LBRACE Statements RBRACE
 
 Call:               ID LPAREN ExpList RPAREN {
                                                     SymEntry func_e = getSymbolEntry($1->ID);
-                                                    if(!isSymInTable($1->ID) || !e.isVariable()) errorUndefFunc(lineno, $1->ID);
+                                                    if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndefFunc(lineno, $1->ID);
                                                     if(e.type != FUNCTYPE) errorUndefFunc(lineno, $1->ID);
                                                     //@TODO use errorPrototypeMismatch correctly
                                                     if($3->expressions.size() != func_e.func_type.first.size()) errorPrototypeMismatch();
@@ -183,7 +199,7 @@ Call:               ID LPAREN ExpList RPAREN {
                                              }
                     | ID LPAREN RPAREN {
                                             SymEntry func_e = getSymbolEntry($1->ID);
-                                            if(!isSymInTable($1->ID) || !e.isVariable()) errorUndefFunc(lineno, $1->ID);
+                                            if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndefFunc(lineno, $1->ID);
                                             if(e.type != FUNCTYPE) errorUndefFunc(lineno, $1->ID);
                                             //@TODO use errorPrototypeMismatch correctly
                                             if(!func_e.func_type.first.empty()) errorPrototypeMismatch();
@@ -225,7 +241,7 @@ Exp:                LPAREN Exp RPAREN {$$ = $2;}
                                     }
                     | ID {
                             SymEntry e = getSymbolEntry($1->ID);
-                            if(!isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
+                            if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
                             if(e.type == STRUCTEXP){
                                 $$ = new Structure(e.struct_type);
                             } else {
@@ -235,7 +251,7 @@ Exp:                LPAREN Exp RPAREN {$$ = $2;}
                          }
                     | ID PERIOD ID {
                                         SymEntry e = getSymbolEntry($1->ID);
-                                        if(!isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
+                                        if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()) errorUndef(lineno);
                                         if(e.type != STRUCTTYPE) errorMismatch(lineno);
                                         if(!isStructTypeInTable(structs, e.struct_type)) errorUndefStruct(lineno, e.struct_type);
                                         StructType t = getStructTypeEntry(structs, e.struct_type);
@@ -301,7 +317,23 @@ ExpType varToExp(varType t){
     }
 }
 
-
+VarType expToVar(ExpType e){
+    switch(e){
+        case INTEXP:
+            return INTTYPE;
+        case BYTEEXP:
+            return BYTETYPE;
+        case BOOLEXP:
+            return BOOLTYPE;
+        case STRUCTEXP:
+            return STRUCTTYPE;
+        case FUNCEXP:
+            return FUNCTYPE;
+        default:
+            //note that no entry in the symbol table can be string or void!
+            return NOTYPE;
+    }
+}
 
 
 
