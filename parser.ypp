@@ -123,8 +123,18 @@ ClosedStatement:    SimpleStatement
 ;
 
 SimpleStatement:    LBRACE Statements RBRACE
-                    | Type ID SC
-                    | StructType ID SC
+                    | Type ID SC {
+                                    if(tables_stack.back().isSymInTable($2->ID)) errorDef(lineno, $2->ID);
+                                    tables_stack.back().addEntry($2->ID, expToVar($1->exp_type));
+                                    delete $1;
+                                    delete $2;
+                                 }
+                    | StructType ID SC {
+                                        if(tables_stack.back().isSymInTable($2->ID)) errorDef(lineno, $2->ID);
+                                        tables_stack.back().addEntry($2->ID, $1->struct_type);
+                                        delete $1;
+                                        delete $2;
+                                       }
                     | STRUCT ID LBRACE StructMemList RBRACE SC
                     | Type ID ASSIGN Exp SC {
                                                 if(tables_stack.back().isSymInTable($2->ID)) errorDef(lineno, $2->ID);
@@ -133,7 +143,6 @@ SimpleStatement:    LBRACE Statements RBRACE
                                                 delete $1;
                                                 delete $2;
                                                 delete $4;
-
                                             }
                     | StructType ID ASSIGN Exp SC {
                                                     if(tables_stack.back().isSymInTable($2->ID)) errorDef(lineno, $2->ID);
