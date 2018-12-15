@@ -35,7 +35,7 @@ StructType getStructTypeEntry(const std::vector<StructType> &structs, const std:
 varType StructType::getFieldType(const std::string& field_name){
     //find the field with the inputted name
     for(StructFieldsType::const_iterator it = fields.begin(); it != fields.end(); ++it){
-        if(field_name.compare((*it).first) == 0){
+        if(field_name == (*it).first){
             return (*it).second;
         }
     }
