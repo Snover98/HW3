@@ -70,5 +70,5 @@ void SymTable::addEntry(const std::string &ID, const std::vector<varType> &func_
 }
 
 int SymTable::structTypeOffset(const std::string &ID) {
-    return getStructTypeEntry(structs, ID).fields.size();
+    return getStructTypeEntry(structs_stack, ID).fields.size();
 }
