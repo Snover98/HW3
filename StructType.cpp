@@ -12,7 +12,7 @@ void addStructType(std::vector<StructType> &structs, StructType t) {
 }
 
 void addStructType(std::vector<StructType> &structs, const std::string &ID,
-                   const std::vector<std::pair<std::string, varType> > &fields) {
+                   const StructFieldsType &fields) {
     addStructType(structs, StructType(ID, fields));
 }
 
