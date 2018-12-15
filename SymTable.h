@@ -36,9 +36,11 @@ struct SymEntry {
                                                                                   struct_type(
                                                                                           std::string(struct_type)) {}
 
-    SymEntry(const std::string &ID, varType type, int offset) : ID(std::string(ID)), type(type), offset(offset) {}
+    SymEntry(const std::string &ID, varType type, int offset) : ID(std::string(ID)), type(type), offset(offset),
+                                                                struct_type("") {}
 
     SymEntry(const std::string &ID, const std::vector<FuncParam> &func_params, varType ret_type) : ID(std::string(ID)),
+                                                                                                   struct_type(""),
                                                                                                    type(FUNCTYPE),
                                                                                                    offset(0),
                                                                                                    func_type(
@@ -54,7 +56,6 @@ struct SymEntry {
 class SymTable {
 private:
     int table_offset;
-    std::vector<SymEntry> scope_entries;
     const std::vector<std::vector<StructType> > &structs_stack;
     SymTable *parent;
 
@@ -62,10 +63,11 @@ private:
 
 
 public:
+    std::vector<SymEntry> scope_entries;
+
     SymTable(const std::vector<std::vector<StructType> > &structs_stack, int offset = 0, SymTable *parent = NULL)
             : table_offset(offset),
-              scope_entries(
-                      std::vector<SymEntry>()),
+              scope_entries(std::vector<SymEntry>()),
               parent(parent), structs_stack(structs_stack) {}
 
     void addEntry(SymEntry e);
