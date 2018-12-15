@@ -19,6 +19,8 @@ std::vector<StructType> structs();
 std::vector<SymTable> tables_stack = std::vector<SymTable>(structs);
 //number of conditional scopes (if/else/while) we are in, used to validate break statements
 unsigned int num_of_while_scopes = 0;
+//var fo knowing what type the current function returns
+ExpType cur_ret_type = VOIDEXP;
 
 
 
@@ -128,8 +130,8 @@ SimpleStatement:    LBRACE Statements RBRACE
                     | ID ASSIGN Exp SC
                     | ID PERIOD ID ASSIGN Exp SC
                     | Call SC
-                    | RETURN SC
-                    | RETURN Exp SC
+                    | RETURN SC {if(cur_ret_type != VOIDEXP) errorMismatch(lineno);}
+                    | RETURN Exp SC {if(!isLegalExpType($2, cur_ret_type)) errorMismatch(lineno);}
                     | BREAK SC {if(num_of_while_scopes == 0) errorUnexpectedBreak(lineno);}
                     | CONTINUE SC {if(num_of_while_scopes == 0) errorUnexpectedContinue(lineno);}
 ;
