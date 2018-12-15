@@ -13,6 +13,13 @@ void yyerror(const char*);
 ExpType varToExp(varType t);
 VarType expToVar(ExpType e);
 
+//functions for creating new scopes
+inline void addEmptyScope();
+void addFuncScope(const std::string &ID, const std::vector<FormalStruct> &formals, ExpType ret_type);
+
+//function for removing scope
+void endScope();
+
 
 //the struct types defined in the code
 std::vector<<std::vector<StructType> > structs_stack();
@@ -21,7 +28,7 @@ structs_stack.push_back(<std::vector<StructType>());
 std::vector<SymTable> tables_stack = std::vector<SymTable>(structs_stack.back());
 //number of conditional scopes (if/else/while) we are in, used to validate break statements
 unsigned int num_of_while_scopes = 0;
-//var fo knowing what type the current function returns
+//var for knowing what type the current function returns
 ExpType cur_ret_type = VOIDEXP;
 
 
@@ -71,32 +78,76 @@ Funcs:              /*epsilon*/
                     | FuncDecl Funcs
 ;
 
-FuncDecl:           RetType ID LPAREN Formals RPAREN LBRACE Statements RBRACE;
+FuncDecl:           RetType ID LPAREN Formals RPAREN {addFuncScope($2->ID, $4->formals, $1->exp_type;)} LBRACE Statements RBRACE {endScope();};
 
 Structs:            /*epsilon*/
                     | StructsDecl Structs
 ;
 
 StructsDecl:        STRUCT ID LBRACE StructMemList RBRACE SC {
+                                                                if(isStructTypeInTable(structs_stack, $2->ID)) errorDef(lineno, $2->ID);
+                                                                if(tables_stack.isSymInTable($2->ID)) errorDef(lineno, $2->ID);
+                                                                structs_stack.back().push_back(StructType($2->ID, $4->fields));
+                                                                delete $2;
+                                                                delete $4;
+                                                             };
 
-//TODO: something like this: addStructType(structs_stack.back(), StructType(((Identifier&)$2)->ID, (some cast&) $4->fields));
-
-};
-
-RetType:            Type
-                    | VOID
+RetType:            Type {$$ = $1;}
+                    | VOID {$$ = new Expression(VOIDEXP);}
 ;
 
-Formals:            /*epsilon*/
-                    FormalsList
+Formals:            {$$ = new FormalList();}
+                    | FormalsList {$$ = $1;}
 ;
 
-FormalsList:        FormalDecl
-                    | FormalDecl COMMA FormalsList
+FormalsList:        FormalDecl {
+                                    $$ = new FormalsList();
+                                    FormalStruct s;
+
+                                    if($1->type == STRUCTEXP){
+                                        s = *$1;
+                                    } else {
+                                        s = FormalStruct($1->ID, $1->type);
+                                    }
+
+                                    $$->formals.push_back(s);
+
+                                    delete $1;
+                               }
+                    | FormalDecl COMMA FormalsList {
+                                                        $$ = $3;
+
+                                                        if(isParamNameTaken($1->ID)) errorDef(lineno, $1->ID);
+
+                                                        FormalStruct s;
+                                                        if($1->type == STRUCTEXP){
+                                                            s = *$1;
+                                                        } else {
+                                                            s = FormalStruct($1->ID, $1->type);
+                                                        }
+
+                                                        $$->formals.push_back(s);
+
+                                                        delete $1;
+                                                   }
 ;
 
-FormalDecl:         Type ID
-                    | StructType ID
+FormalDecl:         Type ID {
+                                if(tables_stack.back().isSymInTable($1->ID) || isStructTypeInTable(structs_stack, $1->ID)){
+                                    errorDef(lineno, $1->ID);
+                                }
+                                $$ = new Formal($2->ID, $1-exp_type);
+                                delete $1;
+                                delete $2;
+                            }
+                    | StructType ID {
+                                        if(tables_stack.back().isSymInTable($1->ID) || isStructTypeInTable(structs_stack, $1->ID)){
+                                            errorDef(lineno, $1->ID);
+                                        }
+                                        $$ = new FormalStruct($2->ID, $1->struct_type);
+                                        delete $1;
+                                        delete $2;
+                                    }
 ;
 
 StructMemList:      StructMem {
@@ -149,7 +200,13 @@ SimpleStatement:    LBRACE Statements RBRACE
                                         delete $1;
                                         delete $2;
                                        }
-                    | STRUCT ID LBRACE StructMemList RBRACE SC
+                    | STRUCT ID LBRACE StructMemList RBRACE SC {
+                                                                    if(isStructTypeInTable(structs_stack, $2->ID)) errorDef(lineno, $2->ID);
+                                                                    if(tables_stack.isSymInTable($2->ID)) errorDef(lineno, $2->ID);
+                                                                    structs_stack.back().push_back(StructType($2->ID, $4->fields));
+                                                                    delete $2;
+                                                                    delete $4;
+                                                               }
                     | Type ID ASSIGN Exp SC {
                                                 if(tables_stack.isSymInTable($2->ID)) errorDef(lineno, $2->ID);
                                                 if(!isLegalExpType($1, $4)) errorMismatch(lineno);
@@ -359,7 +416,44 @@ VarType expToVar(ExpType e){
 }
 
 
+inline void addEmptyScope(){
+    tables_stack.push_back(SymTable(structs_stack, tables_stack.back().nextOffset(), &(tables_stack.back())));
+}
 
+void addFuncScope(const std::string &ID, const std::vector<FormalStruct> &formals, ExpType ret_type){
+    if(tables_stack.back().isSymInTable(ID) || isStructTypeInTable(structs_stack, ID)){
+        errorDef(lineno, ID);
+    }
+
+
+    std::vector<FuncParam> func_params = std::vector<FuncParam>();
+
+    for(std::vector<FormalStruct>::const_iterator it = formals.begin(); it!=formals.end(); ++it){
+        if((*it).type == STRUCTEXP){
+            func_params.push_back(FuncParam((*it).struct_type));
+        } else {
+            func_params.push_back(FuncParam(ExpToVar((*it).type)));
+        }
+    }
+
+    tables_stack.back().addEntry(ID, func_params, ret_type);
+
+    addEmptyScope();
+
+    int offset = 0;
+    for(std::vector<FormalStruct>::const_iterator it = formals.begin(); it!=formals.end(); ++it){
+        SymEntry e;
+
+        if((*it).type == STRUCTEXP){
+            offset -= tables_stack.back().structTypeOffset((*it).struct_type);
+            e = SymEntry((*it).ID, (*it).struct_type, offset);
+        } else {
+            e = SymEntry((*it).ID, ExpToVar((*it).type), --offset);
+        }
+
+        tables_stack.back().addEntry(e);
+    }
+}
 
 
 

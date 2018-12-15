@@ -65,10 +65,14 @@ void SymTable::addEntry(const std::string &ID, varType type) {
     addEntry(SymEntry(ID, type, CALCOFFSET()));
 }
 
-void SymTable::addEntry(const std::string &ID, const std::vector<varType> &func_params, varType ret_type) {
-    addEntry(SymEntry(ID, CALCOFFSET(), func_params, ret_type));
+void SymTable::addEntry(const std::string &ID, const std::vector<FuncParam> &func_params, varType ret_type) {
+    addEntry(SymEntry(ID, func_params, ret_type));
 }
 
 int SymTable::structTypeOffset(const std::string &ID) {
     return getStructTypeEntry(structs_stack, ID).fields.size();
+}
+
+int SymTable::nextOffset(){
+    return CALCOFFSET();
 }

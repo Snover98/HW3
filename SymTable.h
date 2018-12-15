@@ -10,7 +10,17 @@
 #include "Exceptions.h"
 #include "StructType.h"
 
-typedef std::pair<std::vector<varType>, varType> FunctionType;
+struct FuncParam {
+    varType type;
+    const std::string struct_type;
+
+    FuncParam(varType type) : type(type), struct_type(std::string("")) {}
+
+    FuncParam(const std::string &struct_name) : type(STRUCTTYPE), struct_type(std::string(struct_type)) {}
+
+};
+
+typedef std::pair<std::vector<FuncParam>, varType> FunctionType;
 
 struct SymEntry {
     const std::string ID;
@@ -28,15 +38,15 @@ struct SymEntry {
 
     SymEntry(const std::string &ID, varType type, int offset) : ID(std::string(ID)), type(type), offset(offset) {}
 
-    SymEntry(const std::string &ID, int offset, const std::vector<varType> &func_params, varType ret_type) : ID(
-            std::string(ID)),
-                                                                                                             type(FUNCTYPE),
-                                                                                                             offset(offset),
-                                                                                                             func_type(
-                                                                                                                     FunctionType(
-                                                                                                                             func_params,
-                                                                                                                             ret_type)) {}
-    bool isVariable(){
+    SymEntry(const std::string &ID, const std::vector<FuncParam> &func_params, varType ret_type) : ID(std::string(ID)),
+                                                                                                   type(FUNCTYPE),
+                                                                                                   offset(0),
+                                                                                                   func_type(
+                                                                                                           FunctionType(
+                                                                                                                   func_params,
+                                                                                                                   ret_type)) {}
+
+    bool isVariable() {
         return (type == BOOLTYPE || type == BYTETYPE || type == INTTYPE || type == STRUCTTYPE);
     }
 };
@@ -52,10 +62,11 @@ private:
 
 
 public:
-    SymTable(const std::vector<std::vector<StructType> > &structs_stack, int offset = 0, SymTable *parent = NULL) : table_offset(offset),
-                                                                                                scope_entries(
-                                                                                                        std::vector<SymEntry>()),
-                                                                                                parent(parent), structs_stack(structs_stack){}
+    SymTable(const std::vector<std::vector<StructType> > &structs_stack, int offset = 0, SymTable *parent = NULL)
+            : table_offset(offset),
+              scope_entries(
+                      std::vector<SymEntry>()),
+              parent(parent), structs_stack(structs_stack) {}
 
     void addEntry(SymEntry e);
 
@@ -63,7 +74,7 @@ public:
 
     void addEntry(const std::string &ID, varType type);
 
-    void addEntry(const std::string &ID, const std::vector<varType> &func_params, varType ret_type);
+    void addEntry(const std::string &ID, const std::vector<FuncParam> &func_params, varType ret_type);
 
     SymEntry getSymbolEntry(const std::string &ID);
 
@@ -76,6 +87,8 @@ public:
     std::string getStructType(const std::string &ID);
 
     int structTypeOffset(const std::string &ID);
+
+    int nextOffset();
 };
 
 
