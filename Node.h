@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include "StructType.h"
 
 //the type of the expression
 enum ExpType {
@@ -43,6 +44,28 @@ struct ExpressionList : public Node{
     std::vector<Expression> expressions;
 
     ExpressionList() : Node(), expressions(std::vector<Expression>()){}
+};
+
+struct StructMemory : public Node{
+    std::pair<std::string, varType> field;
+
+    StructMemory(const std::string &ID, varType type) : field(std::pair<std::string, varType>(std::string(ID), type)){}
+};
+
+struct StructMemList : public Node{
+    StructFieldsType fields;
+
+    StructMemList() : Node(), fields(StructFieldsType()){}
+
+    bool isFieldNameTaken(std::string &field_name){
+        //look for a field with the inputted name
+        for(StructFieldsType::const_iterator it = fields.begin(); it != fields.end(); ++it){
+            if(field_name == (*it).first) return true;
+        }
+
+        //if now field with that name was found, the name is not taken
+        return false;
+    }
 };
 
 //checks if an expression is a number
