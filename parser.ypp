@@ -354,10 +354,14 @@ Exp:                LPAREN Exp RPAREN {$$ = $2;}
                                         delete $3;
                                    }
                     | Call {$$ = $1;}
-                    | NUM {$$ = new Expression(INTEXP);}
+                    | NUM {
+                            $$ = new Expression(INTEXP);
+                            delete $1;
+                          }
                     | NUM B {
-                                //@TODO make sure that the byte value is <= 255
+                                if(std::stoi($1->ID) > 255) errorByteTooLarge(lineno, $1->ID)
                                 $$ = new Expression(BYTEEXP);
+                                delete $1;
                             }
                     | STRING {$$ = new Expression(STRINGEXP);}
                     | TRUE {$$ = new Expression(BOOLEXP);}

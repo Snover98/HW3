@@ -1,6 +1,7 @@
 %{
 /*C lang stuff*/
 #include "parser.tab.hpp"
+#include "Node.h"
 %}
 
 %option noyywrap
@@ -67,7 +68,10 @@ continue							return CONTINUE;
                                         return ID;
                                     }
 
-0|([1-9][0-9]*)						return NUM;
+0|([1-9][0-9]*)						{
+                                        yylval = new Identifier(std::string(yytext));
+                                        return NUM;
+                                    }
 
 \"([^\n\r\"\\]|\\[rnt"\\])+\"		return STRING;
 
