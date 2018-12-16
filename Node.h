@@ -38,7 +38,7 @@ struct Structure : public Expression {
 struct Identifier : public Node {
     const std::string ID;
 
-    Identifier(const std::string &ID) : Node(), ID(ID) {}
+    Identifier(const std::string &ID) : Node(), ID(std::string(ID)) {}
 };
 
 struct ExpressionList : public Node {
