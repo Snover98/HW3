@@ -5,6 +5,7 @@
 #include <vector>
 #include "Node.h"
 #include "output.hpp"
+#include <string>
 
 #define YYSTYPE Node*
 int yylex();
