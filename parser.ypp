@@ -42,37 +42,57 @@ ExpType cur_ret_type = VOIDEXP;
 
 %}
 
-%left LPAREN
-%left RPAREN
-%left PERIOD
-%left BINOP
-%left RELOP
-%left AND
-%left OR
-%nonassoc NOT
-%nonassoc TRUE
-%nonassoc FALSE
-%nonassoc RETURN
-%nonassoc IF
-%nonassoc ELSE
-%nonassoc WHILE
-%nonassoc BREAK
-%nonassoc CONTINUE
-%nonassoc SC
-%nonassoc COMMA
-%nonassoc LBRACE
-%nonassoc RBRACE
-%right ASSIGN
-%nonassoc VOID
-%nonassoc ID
-%nonassoc NUM
-%nonassoc STRING
-%nonassoc INT
-%nonassoc BYTE
-%nonassoc B
-%nonassoc BOOL
-%nonassoc STRUCT
+%union{
+    Node* node;
+    Expression* expression;
+    Structure* structure;
+    Identifier* identifier;
+    ExpressionList* expression_list;
+    StructMemory* struct_memory;
+    StructMemList* struct_memory_list;
+    Formal* formal;
+    FormalStruct formal_struct;
+    FormalsList* formals_list;
+}
 
+%left <node> LPAREN
+%left <node> RPAREN
+%left <node> PERIOD
+%left <node> BINOP
+%left <node> RELOP
+%left <node> AND
+%left <node> OR
+%nonassoc <node> NOT
+%nonassoc <node> TRUE
+%nonassoc <node> FALSE
+%nonassoc <node> RETURN
+%nonassoc <node> IF
+%nonassoc <node> ELSE
+%nonassoc <node> WHILE
+%nonassoc <node> BREAK
+%nonassoc <node> CONTINUE
+%nonassoc <node> SC
+%nonassoc <node> COMMA
+%nonassoc <node> LBRACE
+%nonassoc <node> RBRACE
+%right <node> ASSIGN
+%nonassoc <node> VOID
+%nonassoc <identifier> ID
+%nonassoc <identifier> NUM
+%nonassoc <node> STRING
+%nonassoc <node> INT
+%nonassoc <node> BYTE
+%nonassoc <node> B
+%nonassoc <node> BOOL
+%nonassoc <node> STRUCT
+
+%type <expression> RetType, Call, Type, Exp
+%type <formals_list> FormalsList, Formals
+%type <formal_struct> FormalDecl
+%type <struct_memory_list> StructMemList
+%type <struct_memory> StructMem
+%type <expression_list> ExpList
+%type <structure> StructType
 
 
 
@@ -94,6 +114,9 @@ Funcs:              /*epsilon*/
 FuncDecl:           RetType ID LPAREN Formals RPAREN {addFuncScope($2->ID, $4->formals, $1->exp_type;)} LBRACE Statements RBRACE {
                                                                                                                                      popScope();
                                                                                                                                      cur_ret_type = VOIDEXP;
+                                                                                                                                     delete $1;
+                                                                                                                                     delete $2;
+                                                                                                                                     delete $4;
                                                                                                                                  };
 
 Structs:            /*epsilon*/
@@ -118,15 +141,8 @@ Formals:            {$$ = new FormalList();}
 
 FormalsList:        FormalDecl {
                                     $$ = new FormalsList();
-                                    FormalStruct s;
 
-                                    if($1->type == STRUCTEXP){
-                                        s = *$1;
-                                    } else {
-                                        s = FormalStruct($1->ID, $1->type);
-                                    }
-
-                                    $$->formals.push_back(s);
+                                    $$->formals.push_back(*$1);
 
                                     delete $1;
                                }
@@ -135,14 +151,7 @@ FormalsList:        FormalDecl {
 
                                                         if(isParamNameTaken($1->ID)) output::errorDef(lineno, $1->ID);
 
-                                                        FormalStruct s;
-                                                        if($1->type == STRUCTEXP){
-                                                            s = *$1;
-                                                        } else {
-                                                            s = FormalStruct($1->ID, $1->type);
-                                                        }
-
-                                                        $$->formals.push_back(s);
+                                                        $$->formals.push_back(*$1);
 
                                                         delete $1;
                                                    }
@@ -152,7 +161,7 @@ FormalDecl:         Type ID {
                                 if(tables_stack.back().isSymInTable($1->ID) || isStructTypeInTable(structs_stack, $1->ID)){
                                     output::errorDef(lineno, $1->ID);
                                 }
-                                $$ = new Formal($2->ID, $1-exp_type);
+                                $$ = new FormalStruct($2->ID, $1-exp_type);
                                 delete $1;
                                 delete $2;
                             }
