@@ -16,7 +16,7 @@ struct FuncParam {
 
     FuncParam(varType type) : type(type), struct_type(std::string("")) {}
 
-    FuncParam(const std::string &struct_name) : type(STRUCTTYPE), struct_type(std::string(struct_type)) {}
+    FuncParam(const std::string &struct_type) : type(STRUCTTYPE), struct_type(std::string(struct_type)) {}
 
 };
 

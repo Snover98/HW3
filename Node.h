@@ -148,7 +148,7 @@ bool isLegalExpType(std::string &actual, std::string &expected) {
 }
 
 Structure expressionToList(Expression *e){
-    if(e->exp_type == STRUCTTYPE){
+    if(e->exp_type == STRUCTEXP){
         return *((Structure*)e);
     }
 

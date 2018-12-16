@@ -10,7 +10,7 @@
 #include "Exceptions.h"
 
 enum varType {
-    INTTYPE, BYTETYPE, BOOLTYPE, STRUCTTYPE, FUNCTYPE, NOTYPE
+    INTTYPE, BYTETYPE, BOOLTYPE, STRUCTTYPE, FUNCTYPE, STRINGTYPE, NOTYPE
 };
 
 typedef std::vector<std::pair<std::string, varType> > StructFieldsType;
