@@ -24,6 +24,8 @@ void popScope();
 std::string typeToString(varType type);
 //function for function -> string conversion
 std::string funcToString(FunctionType &func_type);
+//get function argument types vector as string
+vector<std::string> funcArgTypes(FunctionType &func_type);
 
 //the struct types defined in the code
 std::vector<<std::vector<StructType> > structs_stack();
@@ -275,16 +277,13 @@ Call:               ID LPAREN ExpList RPAREN {
                                                     SymEntry func_e = getSymbolEntry($1->ID);
                                                     if(!tables_stack.isSymInTable($1->ID) || !e.isVariable()) output::errorUndefFunc(lineno, $1->ID);
                                                     if(e.type != FUNCTYPE) output::errorUndefFunc(lineno, $1->ID);
-                                                    //@TODO use output::errorPrototypeMismatch correctly
-                                                    if($3->expressions.size() != func_e.func_type.first.size()) output::errorPrototypeMismatch();
+                                                    if($3->expressions.size() != func_e.func_type.first.size()) output::errorPrototypeMismatch(lineno, $1->ID, funcArgTypes(e.func_type));
 
                                                     std::vector<Expression>::iterator it_exp = = $3->expressions.begin();
                                                     std::vector<FuncParam>::iterator it_arg = = func_e.func_type.first.begin();
                                                     for(; it_exp != $3->expressions.end() && it_arg != func_e.func_type.first.end(); ++it_exp && ++it_arg ){
-                                                        //@TODO use output::errorPrototypeMismatch correctly
-                                                        if((*it_exp).exp_type != varToExp((*it_arg))) output::errorPrototypeMismatch();
-                                                        //@TODO use output::errorPrototypeMismatch correctly
-                                                        if((*it_arg).type == STRUCTTYPE && (*it_arg).struct_type != (*it_exp).struct_type) output::errorPrototypeMismatch();
+                                                        if((*it_exp).exp_type != varToExp((*it_arg))) output::errorPrototypeMismatch(lineno, $1->ID, funcArgTypes(e.func_type));
+                                                        if((*it_arg).type == STRUCTTYPE && (*it_arg).struct_type != (*it_exp).struct_type) output::errorPrototypeMismatch(lineno, $1->ID, funcArgTypes(e.func_type));
                                                     }
 
                                                     $$ = new Expression(varToExp(func_e.func_type.second));
@@ -295,8 +294,7 @@ Call:               ID LPAREN ExpList RPAREN {
                                             SymEntry func_e = getSymbolEntry($1->ID);
                                             if(!tables_stack.isSymInTable($1->ID) || !e.isVariable()) output::errorUndefFunc(lineno, $1->ID);
                                             if(e.type != FUNCTYPE) output::errorUndefFunc(lineno, $1->ID);
-                                            //@TODO use output::errorPrototypeMismatch correctly
-                                            if(!func_e.func_type.first.empty()) output::errorPrototypeMismatch();
+                                            if(!func_e.func_type.first.empty()) output::errorPrototypeMismatch(lineno, $1->ID, funcArgTypes(e.func_type))
 
                                             $$ = new Expression(varToExp(func_e.func_type.second));
                                             delete $1;
@@ -486,14 +484,18 @@ std::string typeToString(varType type){
     }
 }
 
-std::string funcToString(FunctionType &func_type){
+vector<std::string> funcArgTypes(FunctionType &func_type){
     vector<std::string> argTypes = vector<std::string>();
 
     for(std::vector<FuncParam>::iterator it = func_type.first.begin(); it != func_type.first.end(); ++it){
         argTypes.push_back(typeToString((*it).type)+(*it).struct_type);
     }
 
-    return output::makeFunctionType(typeToString(func_type.second), argTypes);
+    return argTypes;
+}
+
+std::string funcToString(FunctionType &func_type){
+    return output::makeFunctionType(typeToString(func_type.second), funcArgTypes(func_type));
 }
 
 
