@@ -63,8 +63,7 @@ continue							return CONTINUE;
 \+|\-|\*|\/							return BINOP;
 
 [a-zA-Z][a-zA-Z0-9]*				{
-                                        yylval=new Identifier();
-                                        (Identifier*)yyval->ID=std::string(yytext);
+                                        yylval = new Identifier(std::string(yytext));
                                         return ID;
                                     }
 
