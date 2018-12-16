@@ -30,7 +30,8 @@ struct Expression : public Node {
 struct Structure : public Expression {
     const std::string struct_type;
 
-    Structure(const std::string &struct_type) : Expression(STRUCTEXP), struct_type(struct_type) {}
+    Structure(const ExpType exp_type) : Expression(exp_type), struct_type(std::string("")){}
+    Structure(const std::string &struct_type) : Expression(STRUCTEXP), struct_type(std::string(struct_type)) {}
 };
 
 //used when there is an identifier read by lex, only used to create the relevant Expression and than deleted
@@ -41,9 +42,9 @@ struct Identifier : public Node {
 };
 
 struct ExpressionList : public Node {
-    std::vector<Expression> expressions;
+    std::vector<Structure> expressions;
 
-    ExpressionList() : Node(), expressions(std::vector<Expression>()) {}
+    ExpressionList() : Node(), expressions(std::vector<Structure>()) {}
 };
 
 struct StructMemory : public Node {
@@ -144,6 +145,14 @@ bool isLegalExpType(ExpType actual, ExpType expected) {
 bool isLegalExpType(std::string &actual, std::string &expected) {
     Structure s = Structure(actual);
     return isLegalExpType(&s, expected);
+}
+
+Structure expressionToList(Expression *e){
+    if(e->exp_type == STRUCTTYPE){
+        return *((Structure*)e);
+    }
+
+    return Structure(e->exp_type);
 }
 
 

@@ -279,7 +279,7 @@ Call:               ID LPAREN ExpList RPAREN {
                                                     if(e.type != FUNCTYPE) output::errorUndefFunc(lineno, $1->ID);
                                                     if($3->expressions.size() != func_e.func_type.first.size()) output::errorPrototypeMismatch(lineno, $1->ID, funcArgTypes(e.func_type));
 
-                                                    std::vector<Expression>::iterator it_exp = = $3->expressions.begin();
+                                                    std::vector<Structure>::iterator it_exp = = $3->expressions.begin();
                                                     std::vector<FuncParam>::iterator it_arg = = func_e.func_type.first.begin();
                                                     for(; it_exp != $3->expressions.end() && it_arg != func_e.func_type.first.end(); ++it_exp && ++it_arg ){
                                                         if((*it_exp).exp_type != varToExp((*it_arg))) output::errorPrototypeMismatch(lineno, $1->ID, funcArgTypes(e.func_type));
@@ -303,12 +303,12 @@ Call:               ID LPAREN ExpList RPAREN {
 
 ExpList:            Exp {
                             $$ = new ExpressionList();
-                            $$->expressions.push_back(*($1));
+                            $$->expressions.push_back(expressionToList($1));
                             delete $1;
                         }
                     | Exp COMMA ExpList {
                                             $$ = $3;
-                                            $$->expressions.push_back(*($1));
+                                            $$->expressions.push_back(expressionToList($1));
                                             delete $1;
                                         }
 ;
