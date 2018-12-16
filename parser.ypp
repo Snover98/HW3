@@ -101,9 +101,10 @@ Structs:            /*epsilon*/
 ;
 
 StructsDecl:        STRUCT ID LBRACE StructMemList RBRACE SC {
-                                                                if(isStructTypeInTable(structs_stack, $2->ID)) output::errorDef(lineno, $2->ID);
-                                                                if(tables_stack.isSymInTable($2->ID)) output::errorDef(lineno, $2->ID);
-                                                                structs_stack.back().push_back(StructType($2->ID, $4->fields));
+                                                                std::string &func_id = ((Identifier*)$2)->ID;
+                                                                if(isStructTypeInTable(structs_stack, func_id)) output::errorDef(lineno, func_id);
+                                                                if(tables_stack.isSymInTable(func_id)) output::errorDef(lineno, func_id);
+                                                                structs_stack.back().push_back(StructType(func_id, ((StructMemList*)$4)->fields));
                                                                 delete $2;
                                                                 delete $4;
                                                              };
@@ -120,47 +121,51 @@ FormalsList:        FormalDecl {
                                     $$ = new FormalsList();
                                     FormalStruct s;
 
-                                    if($1->type == STRUCTEXP){
-                                        s = *$1;
+                                    Expression* decl = (Expression*)$1;
+
+                                    if(decl->type == STRUCTEXP){
+                                        s = *((FormalStruct*)$1);
                                     } else {
-                                        s = FormalStruct($1->ID, $1->type);
+                                        s = FormalStruct(decl->ID, decl->type);
                                     }
 
-                                    $$->formals.push_back(s);
+                                    ((FormalsList*)$$)->formals.push_back(s);
 
                                     delete $1;
                                }
                     | FormalDecl COMMA FormalsList {
                                                         $$ = $3;
 
-                                                        if(isParamNameTaken($1->ID)) output::errorDef(lineno, $1->ID);
+                                                        Expression* decl = (Expression*)$1;
+
+                                                        if(isParamNameTaken(decl->ID)) output::errorDef(lineno, decl->ID);
 
                                                         FormalStruct s;
-                                                        if($1->type == STRUCTEXP){
-                                                            s = *$1;
+                                                        if(decl->type == STRUCTEXP){
+                                                            s = *((FormalStruct*)$1);
                                                         } else {
-                                                            s = FormalStruct($1->ID, $1->type);
+                                                            s = FormalStruct(decl->ID, decl->type);
                                                         }
 
-                                                        $$->formals.push_back(s);
+                                                        ((FormalsList*)$$)->formals.push_back(s);
 
                                                         delete $1;
                                                    }
 ;
 
 FormalDecl:         Type ID {
-                                if(tables_stack.back().isSymInTable($1->ID) || isStructTypeInTable(structs_stack, $1->ID)){
-                                    output::errorDef(lineno, $1->ID);
+                                if(tables_stack.back().isSymInTable(((Expression*)$1)->ID) || isStructTypeInTable(structs_stack, ((Expression*)$1)->ID)){
+                                    output::errorDef(lineno, ((Expression*)$1)->ID);
                                 }
-                                $$ = new Formal($2->ID, $1-exp_type);
+                                $$ = new Formal(((Identifier*)$2)->ID, ((Expression*)$1)->exp_type);
                                 delete $1;
                                 delete $2;
                             }
                     | StructType ID {
-                                        if(tables_stack.back().isSymInTable($1->ID) || isStructTypeInTable(structs_stack, $1->ID)){
-                                            output::errorDef(lineno, $1->ID);
+                                        if(tables_stack.back().isSymInTable(((Structure*)$1)->ID) || isStructTypeInTable(structs_stack, ((Structure*)$1)->ID)){
+                                            output::errorDef(lineno, ((Structure*)$1)->ID);
                                         }
-                                        $$ = new FormalStruct($2->ID, $1->struct_type);
+                                        $$ = new FormalStruct(((Identifier*)$2)->ID, ((Structure*)$1)->struct_type);
                                         delete $1;
                                         delete $2;
                                     }
@@ -168,19 +173,19 @@ FormalDecl:         Type ID {
 
 StructMemList:      StructMem {
                                 $$ = new StructMemList();
-                                $$->fields.push_back($1->field);
+                                ((StructMemList*)$$)->fields.push_back($1->field);
                                 delete $1;
                               }
                     | StructMem StructMemList {
                                                 $$ = $2;
-                                                if($$->isFieldNameTaken($1->field.first)) output::errorDef(lineno, $1->field.first);
-                                                $$->fields.push_back($1->field);
+                                                if(((StructMemList*)$$)->isFieldNameTaken($1->field.first)) output::errorDef(lineno, ((StructMemList*)$1)->field.first);
+                                                ((StructMemList*)$$)->fields.push_back($1->field);
                                                 delete $1;
                                               }
 ;
 
 StructMem:          Type ID SC {
-                                    $$ = new StructMemory($2->ID, expToVar($2->exp_type));
+                                    $$ = new StructMemory(((Expression*)$2)->ID, expToVar(((Identifier*)$1)->exp_type));
                                     delete $1;
                                     delete $2;
                                };
