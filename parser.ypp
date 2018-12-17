@@ -637,7 +637,7 @@ vector<std::string> funcArgTypes(FunctionType &func_type){
     vector<std::string> argTypes = vector<std::string>();
 
     for(std::vector<FuncParam>::iterator it = func_type.first.begin(); it != func_type.first.end(); ++it){
-        argTypes.push_back(typeToString((*it).type)+(*it).struct_type);
+        argTypes.push_back(typeToString((*it).type) + (((*it).type == STRUCTTYPE) ? (" " + (*it).struct_type) : ""));
     }
 
     return argTypes;
@@ -658,7 +658,7 @@ void popScope(){
         if((*it).type == FUNCTYPE){
             type = funcToString((*it).func_type);
         } else{
-            type = typeToString((*it).type) + (*it).struct_type;
+            type = typeToString((*it).type) + (((*it).type == STRUCTTYPE) ? (" " + (*it).struct_type) : "");
         }
 
         output::printID((*it).ID, (*it).offset, type);
@@ -680,6 +680,8 @@ void popScope(){
 
     tables_stack.pop_back();
     structs_stack.pop_back();
+
+    output::endScope();
 }
 
 void addPrints(){
