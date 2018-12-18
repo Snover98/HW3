@@ -2,6 +2,8 @@
 /*C lang stuff*/
 #include "parser.tab.hpp"
 #include "Node.h"
+#include "output.hpp"
+
 %}
 
 %option noyywrap
@@ -49,7 +51,7 @@ continue							return CONTINUE;
 
 \.									return PERIOD;
 
-\(									return LPAREN
+\(									return LPAREN;
 
 \)									return RPAREN;
 
