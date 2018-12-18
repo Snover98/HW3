@@ -65,7 +65,7 @@ addPrints();
 %left <node> RELOP
 %left <node> AND
 %left <node> OR
-%nonassoc <node> NOT
+%right <node> NOT
 %nonassoc <node> TRUE
 %nonassoc <node> FALSE
 %nonassoc <node> RETURN
@@ -223,14 +223,15 @@ Statement:          OpenStatement
                     | ClosedStatement
 ;
 
-OpenStatement:      IF {addEmptyScope();} LPAREN Exp RPAREN Statement {popScope();}
-                    | IF {addEmptyScope();} LPAREN Exp RPAREN ClosedStatement {popScope();} ELSE {addEmptyScope();} OpenStatement {popScope();}
-                    | WHILE {addEmptyScope();} LPAREN Exp RPAREN {++num_of_while_scopes;} OpenStatement {--num_of_while_scopes;} {popScope();}
+OpenStatement:      IF M1 LPAREN Exp RPAREN SimpleStatement M2
+                    | IF M1 LPAREN Exp RPAREN OpenStatement M2
+                    | IF M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 OpenStatement M2
+                    | WHILE M1 LPAREN Exp RPAREN M3 OpenStatement M4 M2
 ;
 
 ClosedStatement:    SimpleStatement
-                    | IF {addEmptyScope();} LPAREN Exp RPAREN ClosedStatement ELSE ClosedStatement
-                    | WHILE {addEmptyScope();} LPAREN Exp RPAREN {++num_of_while_scopes;} ClosedStatement {--num_of_while_scopes;} {popScope();}
+                    | IF M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 ClosedStatement M2
+                    | WHILE M1 LPAREN Exp RPAREN M3 ClosedStatement M4 M2
 ;
 
 SimpleStatement:    LBRACE {addEmptyScope();} Statements {popScope();} RBRACE
@@ -531,7 +532,17 @@ Exp:                LPAREN Exp RPAREN {$$ = $2;}
                                     }
 ;
 
+M1:                 {addEmptyScope();}
+;
 
+M2:                 {popScope();}
+;
+
+M3:                  {++num_of_while_scopes;}
+;
+
+M4:                 {--num_of_while_scopes;}
+;
 
 %%
 

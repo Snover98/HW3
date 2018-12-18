@@ -1,0 +1,1775 @@
+Grammar
+
+    0 $accept: Program $end
+
+    1 Program: Structs Funcs
+
+    2 Funcs: %empty
+    3      | FuncDecl Funcs
+
+    4 $@1: %empty
+
+    5 FuncDecl: RetType ID LPAREN Formals RPAREN $@1 LBRACE Statements RBRACE
+
+    6 Structs: %empty
+    7        | StructsDecl Structs
+
+    8 StructsDecl: STRUCT ID LBRACE StructMemList RBRACE SC
+
+    9 RetType: Type
+   10        | VOID
+
+   11 Formals: %empty
+   12        | FormalsList
+
+   13 FormalsList: FormalDecl
+   14            | FormalDecl COMMA FormalsList
+
+   15 FormalDecl: Type ID
+   16           | StructType ID
+
+   17 StructMemList: StructMem
+   18              | StructMem StructMemList
+
+   19 StructMem: Type ID SC
+
+   20 Statements: Statement
+   21           | Statements Statement
+
+   22 Statement: OpenStatement
+   23          | ClosedStatement
+
+   24 OpenStatement: IF M1 LPAREN Exp RPAREN SimpleStatement M2
+   25              | IF M1 LPAREN Exp RPAREN OpenStatement M2
+   26              | IF M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 OpenStatement M2
+   27              | WHILE M1 LPAREN Exp RPAREN M3 OpenStatement M4 M2
+
+   28 ClosedStatement: SimpleStatement
+   29                | IF M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 ClosedStatement M2
+   30                | WHILE M1 LPAREN Exp RPAREN M3 ClosedStatement M4 M2
+
+   31 $@2: %empty
+
+   32 $@3: %empty
+
+   33 SimpleStatement: LBRACE $@2 Statements $@3 RBRACE
+   34                | Type ID SC
+   35                | StructType ID SC
+   36                | STRUCT ID LBRACE StructMemList RBRACE SC
+   37                | Type ID ASSIGN Exp SC
+   38                | StructType ID ASSIGN Exp SC
+   39                | ID ASSIGN Exp SC
+   40                | ID PERIOD ID ASSIGN Exp SC
+   41                | Call SC
+   42                | RETURN SC
+   43                | RETURN Exp SC
+   44                | BREAK SC
+   45                | CONTINUE SC
+
+   46 Call: ID LPAREN ExpList RPAREN
+   47     | ID LPAREN RPAREN
+
+   48 ExpList: Exp
+   49        | Exp COMMA ExpList
+
+   50 Type: INT
+   51     | BYTE
+   52     | BOOL
+
+   53 StructType: STRUCT ID
+
+   54 Exp: LPAREN Exp RPAREN
+   55    | Exp BINOP Exp
+   56    | ID
+   57    | ID PERIOD ID
+   58    | Call
+   59    | NUM
+   60    | NUM B
+   61    | STRING
+   62    | TRUE
+   63    | FALSE
+   64    | NOT Exp
+   65    | Exp AND Exp
+   66    | Exp OR Exp
+   67    | Exp RELOP Exp
+
+   68 M1: %empty
+
+   69 M2: %empty
+
+   70 M3: %empty
+
+   71 M4: %empty
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+LPAREN (258) 5 24 25 26 27 29 30 46 47 54
+RPAREN (259) 5 24 25 26 27 29 30 46 47 54
+PERIOD (260) 40 57
+BINOP (261) 55
+RELOP (262) 67
+AND (263) 65
+OR (264) 66
+NOT (265) 64
+TRUE (266) 62
+FALSE (267) 63
+RETURN (268) 42 43
+IF (269) 24 25 26 29
+ELSE (270) 26 29
+WHILE (271) 27 30
+BREAK (272) 44
+CONTINUE (273) 45
+SC (274) 8 19 34 35 36 37 38 39 40 41 42 43 44 45
+COMMA (275) 14 49
+LBRACE (276) 5 8 33 36
+RBRACE (277) 5 8 33 36
+ASSIGN (278) 37 38 39 40
+VOID (279) 10
+ID (280) 5 8 15 16 19 34 35 36 37 38 39 40 46 47 53 56 57
+NUM (281) 59 60
+STRING (282) 61
+INT (283) 50
+BYTE (284) 51
+B (285) 60
+BOOL (286) 52
+STRUCT (287) 8 36 53
+
+
+Nonterminals, with rules where they appear
+
+$accept (33)
+    on left: 0
+Program (34)
+    on left: 1, on right: 0
+Funcs (35)
+    on left: 2 3, on right: 1 3
+FuncDecl (36)
+    on left: 5, on right: 3
+$@1 (37)
+    on left: 4, on right: 5
+Structs (38)
+    on left: 6 7, on right: 1 7
+StructsDecl (39)
+    on left: 8, on right: 7
+RetType (40)
+    on left: 9 10, on right: 5
+Formals (41)
+    on left: 11 12, on right: 5
+FormalsList (42)
+    on left: 13 14, on right: 12 14
+FormalDecl (43)
+    on left: 15 16, on right: 13 14
+StructMemList (44)
+    on left: 17 18, on right: 8 18 36
+StructMem (45)
+    on left: 19, on right: 17 18
+Statements (46)
+    on left: 20 21, on right: 5 21 33
+Statement (47)
+    on left: 22 23, on right: 20 21
+OpenStatement (48)
+    on left: 24 25 26 27, on right: 22 25 26 27
+ClosedStatement (49)
+    on left: 28 29 30, on right: 23 26 29 30
+SimpleStatement (50)
+    on left: 33 34 35 36 37 38 39 40 41 42 43 44 45, on right: 24 28
+$@2 (51)
+    on left: 31, on right: 33
+$@3 (52)
+    on left: 32, on right: 33
+Call (53)
+    on left: 46 47, on right: 41 58
+ExpList (54)
+    on left: 48 49, on right: 46 49
+Type (55)
+    on left: 50 51 52, on right: 9 15 19 34 37
+StructType (56)
+    on left: 53, on right: 16 35 38
+Exp (57)
+    on left: 54 55 56 57 58 59 60 61 62 63 64 65 66 67, on right: 24
+    25 26 27 29 30 37 38 39 40 43 48 49 54 55 64 65 66 67
+M1 (58)
+    on left: 68, on right: 24 25 26 27 29 30
+M2 (59)
+    on left: 69, on right: 24 25 26 27 29 30
+M3 (60)
+    on left: 70, on right: 27 30
+M4 (61)
+    on left: 71, on right: 27 30
+
+
+State 0
+
+    0 $accept: . Program $end
+
+    STRUCT  shift, and go to state 1
+
+    $default  reduce using rule 6 (Structs)
+
+    Program      go to state 2
+    Structs      go to state 3
+    StructsDecl  go to state 4
+
+
+State 1
+
+    8 StructsDecl: STRUCT . ID LBRACE StructMemList RBRACE SC
+
+    ID  shift, and go to state 5
+
+
+State 2
+
+    0 $accept: Program . $end
+
+    $end  shift, and go to state 6
+
+
+State 3
+
+    1 Program: Structs . Funcs
+
+    VOID  shift, and go to state 7
+    INT   shift, and go to state 8
+    BYTE  shift, and go to state 9
+    BOOL  shift, and go to state 10
+
+    $default  reduce using rule 2 (Funcs)
+
+    Funcs     go to state 11
+    FuncDecl  go to state 12
+    RetType   go to state 13
+    Type      go to state 14
+
+
+State 4
+
+    7 Structs: StructsDecl . Structs
+
+    STRUCT  shift, and go to state 1
+
+    $default  reduce using rule 6 (Structs)
+
+    Structs      go to state 15
+    StructsDecl  go to state 4
+
+
+State 5
+
+    8 StructsDecl: STRUCT ID . LBRACE StructMemList RBRACE SC
+
+    LBRACE  shift, and go to state 16
+
+
+State 6
+
+    0 $accept: Program $end .
+
+    $default  accept
+
+
+State 7
+
+   10 RetType: VOID .
+
+    $default  reduce using rule 10 (RetType)
+
+
+State 8
+
+   50 Type: INT .
+
+    $default  reduce using rule 50 (Type)
+
+
+State 9
+
+   51 Type: BYTE .
+
+    $default  reduce using rule 51 (Type)
+
+
+State 10
+
+   52 Type: BOOL .
+
+    $default  reduce using rule 52 (Type)
+
+
+State 11
+
+    1 Program: Structs Funcs .
+
+    $default  reduce using rule 1 (Program)
+
+
+State 12
+
+    3 Funcs: FuncDecl . Funcs
+
+    VOID  shift, and go to state 7
+    INT   shift, and go to state 8
+    BYTE  shift, and go to state 9
+    BOOL  shift, and go to state 10
+
+    $default  reduce using rule 2 (Funcs)
+
+    Funcs     go to state 17
+    FuncDecl  go to state 12
+    RetType   go to state 13
+    Type      go to state 14
+
+
+State 13
+
+    5 FuncDecl: RetType . ID LPAREN Formals RPAREN $@1 LBRACE Statements RBRACE
+
+    ID  shift, and go to state 18
+
+
+State 14
+
+    9 RetType: Type .
+
+    $default  reduce using rule 9 (RetType)
+
+
+State 15
+
+    7 Structs: StructsDecl Structs .
+
+    $default  reduce using rule 7 (Structs)
+
+
+State 16
+
+    8 StructsDecl: STRUCT ID LBRACE . StructMemList RBRACE SC
+
+    INT   shift, and go to state 8
+    BYTE  shift, and go to state 9
+    BOOL  shift, and go to state 10
+
+    StructMemList  go to state 19
+    StructMem      go to state 20
+    Type           go to state 21
+
+
+State 17
+
+    3 Funcs: FuncDecl Funcs .
+
+    $default  reduce using rule 3 (Funcs)
+
+
+State 18
+
+    5 FuncDecl: RetType ID . LPAREN Formals RPAREN $@1 LBRACE Statements RBRACE
+
+    LPAREN  shift, and go to state 22
+
+
+State 19
+
+    8 StructsDecl: STRUCT ID LBRACE StructMemList . RBRACE SC
+
+    RBRACE  shift, and go to state 23
+
+
+State 20
+
+   17 StructMemList: StructMem .
+   18              | StructMem . StructMemList
+
+    INT   shift, and go to state 8
+    BYTE  shift, and go to state 9
+    BOOL  shift, and go to state 10
+
+    $default  reduce using rule 17 (StructMemList)
+
+    StructMemList  go to state 24
+    StructMem      go to state 20
+    Type           go to state 21
+
+
+State 21
+
+   19 StructMem: Type . ID SC
+
+    ID  shift, and go to state 25
+
+
+State 22
+
+    5 FuncDecl: RetType ID LPAREN . Formals RPAREN $@1 LBRACE Statements RBRACE
+
+    INT     shift, and go to state 8
+    BYTE    shift, and go to state 9
+    BOOL    shift, and go to state 10
+    STRUCT  shift, and go to state 26
+
+    $default  reduce using rule 11 (Formals)
+
+    Formals      go to state 27
+    FormalsList  go to state 28
+    FormalDecl   go to state 29
+    Type         go to state 30
+    StructType   go to state 31
+
+
+State 23
+
+    8 StructsDecl: STRUCT ID LBRACE StructMemList RBRACE . SC
+
+    SC  shift, and go to state 32
+
+
+State 24
+
+   18 StructMemList: StructMem StructMemList .
+
+    $default  reduce using rule 18 (StructMemList)
+
+
+State 25
+
+   19 StructMem: Type ID . SC
+
+    SC  shift, and go to state 33
+
+
+State 26
+
+   53 StructType: STRUCT . ID
+
+    ID  shift, and go to state 34
+
+
+State 27
+
+    5 FuncDecl: RetType ID LPAREN Formals . RPAREN $@1 LBRACE Statements RBRACE
+
+    RPAREN  shift, and go to state 35
+
+
+State 28
+
+   12 Formals: FormalsList .
+
+    $default  reduce using rule 12 (Formals)
+
+
+State 29
+
+   13 FormalsList: FormalDecl .
+   14            | FormalDecl . COMMA FormalsList
+
+    COMMA  shift, and go to state 36
+
+    $default  reduce using rule 13 (FormalsList)
+
+
+State 30
+
+   15 FormalDecl: Type . ID
+
+    ID  shift, and go to state 37
+
+
+State 31
+
+   16 FormalDecl: StructType . ID
+
+    ID  shift, and go to state 38
+
+
+State 32
+
+    8 StructsDecl: STRUCT ID LBRACE StructMemList RBRACE SC .
+
+    $default  reduce using rule 8 (StructsDecl)
+
+
+State 33
+
+   19 StructMem: Type ID SC .
+
+    $default  reduce using rule 19 (StructMem)
+
+
+State 34
+
+   53 StructType: STRUCT ID .
+
+    $default  reduce using rule 53 (StructType)
+
+
+State 35
+
+    5 FuncDecl: RetType ID LPAREN Formals RPAREN . $@1 LBRACE Statements RBRACE
+
+    $default  reduce using rule 4 ($@1)
+
+    $@1  go to state 39
+
+
+State 36
+
+   14 FormalsList: FormalDecl COMMA . FormalsList
+
+    INT     shift, and go to state 8
+    BYTE    shift, and go to state 9
+    BOOL    shift, and go to state 10
+    STRUCT  shift, and go to state 26
+
+    FormalsList  go to state 40
+    FormalDecl   go to state 29
+    Type         go to state 30
+    StructType   go to state 31
+
+
+State 37
+
+   15 FormalDecl: Type ID .
+
+    $default  reduce using rule 15 (FormalDecl)
+
+
+State 38
+
+   16 FormalDecl: StructType ID .
+
+    $default  reduce using rule 16 (FormalDecl)
+
+
+State 39
+
+    5 FuncDecl: RetType ID LPAREN Formals RPAREN $@1 . LBRACE Statements RBRACE
+
+    LBRACE  shift, and go to state 41
+
+
+State 40
+
+   14 FormalsList: FormalDecl COMMA FormalsList .
+
+    $default  reduce using rule 14 (FormalsList)
+
+
+State 41
+
+    5 FuncDecl: RetType ID LPAREN Formals RPAREN $@1 LBRACE . Statements RBRACE
+
+    RETURN    shift, and go to state 42
+    IF        shift, and go to state 43
+    WHILE     shift, and go to state 44
+    BREAK     shift, and go to state 45
+    CONTINUE  shift, and go to state 46
+    LBRACE    shift, and go to state 47
+    ID        shift, and go to state 48
+    INT       shift, and go to state 8
+    BYTE      shift, and go to state 9
+    BOOL      shift, and go to state 10
+    STRUCT    shift, and go to state 49
+
+    Statements       go to state 50
+    Statement        go to state 51
+    OpenStatement    go to state 52
+    ClosedStatement  go to state 53
+    SimpleStatement  go to state 54
+    Call             go to state 55
+    Type             go to state 56
+    StructType       go to state 57
+
+
+State 42
+
+   42 SimpleStatement: RETURN . SC
+   43                | RETURN . Exp SC
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    SC      shift, and go to state 62
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call  go to state 66
+    Exp   go to state 67
+
+
+State 43
+
+   24 OpenStatement: IF . M1 LPAREN Exp RPAREN SimpleStatement M2
+   25              | IF . M1 LPAREN Exp RPAREN OpenStatement M2
+   26              | IF . M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 OpenStatement M2
+   29 ClosedStatement: IF . M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 ClosedStatement M2
+
+    $default  reduce using rule 68 (M1)
+
+    M1  go to state 68
+
+
+State 44
+
+   27 OpenStatement: WHILE . M1 LPAREN Exp RPAREN M3 OpenStatement M4 M2
+   30 ClosedStatement: WHILE . M1 LPAREN Exp RPAREN M3 ClosedStatement M4 M2
+
+    $default  reduce using rule 68 (M1)
+
+    M1  go to state 69
+
+
+State 45
+
+   44 SimpleStatement: BREAK . SC
+
+    SC  shift, and go to state 70
+
+
+State 46
+
+   45 SimpleStatement: CONTINUE . SC
+
+    SC  shift, and go to state 71
+
+
+State 47
+
+   33 SimpleStatement: LBRACE . $@2 Statements $@3 RBRACE
+
+    $default  reduce using rule 31 ($@2)
+
+    $@2  go to state 72
+
+
+State 48
+
+   39 SimpleStatement: ID . ASSIGN Exp SC
+   40                | ID . PERIOD ID ASSIGN Exp SC
+   46 Call: ID . LPAREN ExpList RPAREN
+   47     | ID . LPAREN RPAREN
+
+    LPAREN  shift, and go to state 73
+    PERIOD  shift, and go to state 74
+    ASSIGN  shift, and go to state 75
+
+
+State 49
+
+   36 SimpleStatement: STRUCT . ID LBRACE StructMemList RBRACE SC
+   53 StructType: STRUCT . ID
+
+    ID  shift, and go to state 76
+
+
+State 50
+
+    5 FuncDecl: RetType ID LPAREN Formals RPAREN $@1 LBRACE Statements . RBRACE
+   21 Statements: Statements . Statement
+
+    RETURN    shift, and go to state 42
+    IF        shift, and go to state 43
+    WHILE     shift, and go to state 44
+    BREAK     shift, and go to state 45
+    CONTINUE  shift, and go to state 46
+    LBRACE    shift, and go to state 47
+    RBRACE    shift, and go to state 77
+    ID        shift, and go to state 48
+    INT       shift, and go to state 8
+    BYTE      shift, and go to state 9
+    BOOL      shift, and go to state 10
+    STRUCT    shift, and go to state 49
+
+    Statement        go to state 78
+    OpenStatement    go to state 52
+    ClosedStatement  go to state 53
+    SimpleStatement  go to state 54
+    Call             go to state 55
+    Type             go to state 56
+    StructType       go to state 57
+
+
+State 51
+
+   20 Statements: Statement .
+
+    $default  reduce using rule 20 (Statements)
+
+
+State 52
+
+   22 Statement: OpenStatement .
+
+    $default  reduce using rule 22 (Statement)
+
+
+State 53
+
+   23 Statement: ClosedStatement .
+
+    $default  reduce using rule 23 (Statement)
+
+
+State 54
+
+   28 ClosedStatement: SimpleStatement .
+
+    $default  reduce using rule 28 (ClosedStatement)
+
+
+State 55
+
+   41 SimpleStatement: Call . SC
+
+    SC  shift, and go to state 79
+
+
+State 56
+
+   34 SimpleStatement: Type . ID SC
+   37                | Type . ID ASSIGN Exp SC
+
+    ID  shift, and go to state 80
+
+
+State 57
+
+   35 SimpleStatement: StructType . ID SC
+   38                | StructType . ID ASSIGN Exp SC
+
+    ID  shift, and go to state 81
+
+
+State 58
+
+   54 Exp: LPAREN . Exp RPAREN
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call  go to state 66
+    Exp   go to state 82
+
+
+State 59
+
+   64 Exp: NOT . Exp
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call  go to state 66
+    Exp   go to state 83
+
+
+State 60
+
+   62 Exp: TRUE .
+
+    $default  reduce using rule 62 (Exp)
+
+
+State 61
+
+   63 Exp: FALSE .
+
+    $default  reduce using rule 63 (Exp)
+
+
+State 62
+
+   42 SimpleStatement: RETURN SC .
+
+    $default  reduce using rule 42 (SimpleStatement)
+
+
+State 63
+
+   46 Call: ID . LPAREN ExpList RPAREN
+   47     | ID . LPAREN RPAREN
+   56 Exp: ID .
+   57    | ID . PERIOD ID
+
+    LPAREN  shift, and go to state 73
+    PERIOD  shift, and go to state 84
+
+    $default  reduce using rule 56 (Exp)
+
+
+State 64
+
+   59 Exp: NUM .
+   60    | NUM . B
+
+    B  shift, and go to state 85
+
+    $default  reduce using rule 59 (Exp)
+
+
+State 65
+
+   61 Exp: STRING .
+
+    $default  reduce using rule 61 (Exp)
+
+
+State 66
+
+   58 Exp: Call .
+
+    $default  reduce using rule 58 (Exp)
+
+
+State 67
+
+   43 SimpleStatement: RETURN Exp . SC
+   55 Exp: Exp . BINOP Exp
+   65    | Exp . AND Exp
+   66    | Exp . OR Exp
+   67    | Exp . RELOP Exp
+
+    BINOP  shift, and go to state 86
+    RELOP  shift, and go to state 87
+    AND    shift, and go to state 88
+    OR     shift, and go to state 89
+    SC     shift, and go to state 90
+
+
+State 68
+
+   24 OpenStatement: IF M1 . LPAREN Exp RPAREN SimpleStatement M2
+   25              | IF M1 . LPAREN Exp RPAREN OpenStatement M2
+   26              | IF M1 . LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 OpenStatement M2
+   29 ClosedStatement: IF M1 . LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 ClosedStatement M2
+
+    LPAREN  shift, and go to state 91
+
+
+State 69
+
+   27 OpenStatement: WHILE M1 . LPAREN Exp RPAREN M3 OpenStatement M4 M2
+   30 ClosedStatement: WHILE M1 . LPAREN Exp RPAREN M3 ClosedStatement M4 M2
+
+    LPAREN  shift, and go to state 92
+
+
+State 70
+
+   44 SimpleStatement: BREAK SC .
+
+    $default  reduce using rule 44 (SimpleStatement)
+
+
+State 71
+
+   45 SimpleStatement: CONTINUE SC .
+
+    $default  reduce using rule 45 (SimpleStatement)
+
+
+State 72
+
+   33 SimpleStatement: LBRACE $@2 . Statements $@3 RBRACE
+
+    RETURN    shift, and go to state 42
+    IF        shift, and go to state 43
+    WHILE     shift, and go to state 44
+    BREAK     shift, and go to state 45
+    CONTINUE  shift, and go to state 46
+    LBRACE    shift, and go to state 47
+    ID        shift, and go to state 48
+    INT       shift, and go to state 8
+    BYTE      shift, and go to state 9
+    BOOL      shift, and go to state 10
+    STRUCT    shift, and go to state 49
+
+    Statements       go to state 93
+    Statement        go to state 51
+    OpenStatement    go to state 52
+    ClosedStatement  go to state 53
+    SimpleStatement  go to state 54
+    Call             go to state 55
+    Type             go to state 56
+    StructType       go to state 57
+
+
+State 73
+
+   46 Call: ID LPAREN . ExpList RPAREN
+   47     | ID LPAREN . RPAREN
+
+    LPAREN  shift, and go to state 58
+    RPAREN  shift, and go to state 94
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call     go to state 66
+    ExpList  go to state 95
+    Exp      go to state 96
+
+
+State 74
+
+   40 SimpleStatement: ID PERIOD . ID ASSIGN Exp SC
+
+    ID  shift, and go to state 97
+
+
+State 75
+
+   39 SimpleStatement: ID ASSIGN . Exp SC
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call  go to state 66
+    Exp   go to state 98
+
+
+State 76
+
+   36 SimpleStatement: STRUCT ID . LBRACE StructMemList RBRACE SC
+   53 StructType: STRUCT ID .
+
+    LBRACE  shift, and go to state 99
+
+    $default  reduce using rule 53 (StructType)
+
+
+State 77
+
+    5 FuncDecl: RetType ID LPAREN Formals RPAREN $@1 LBRACE Statements RBRACE .
+
+    $default  reduce using rule 5 (FuncDecl)
+
+
+State 78
+
+   21 Statements: Statements Statement .
+
+    $default  reduce using rule 21 (Statements)
+
+
+State 79
+
+   41 SimpleStatement: Call SC .
+
+    $default  reduce using rule 41 (SimpleStatement)
+
+
+State 80
+
+   34 SimpleStatement: Type ID . SC
+   37                | Type ID . ASSIGN Exp SC
+
+    SC      shift, and go to state 100
+    ASSIGN  shift, and go to state 101
+
+
+State 81
+
+   35 SimpleStatement: StructType ID . SC
+   38                | StructType ID . ASSIGN Exp SC
+
+    SC      shift, and go to state 102
+    ASSIGN  shift, and go to state 103
+
+
+State 82
+
+   54 Exp: LPAREN Exp . RPAREN
+   55    | Exp . BINOP Exp
+   65    | Exp . AND Exp
+   66    | Exp . OR Exp
+   67    | Exp . RELOP Exp
+
+    RPAREN  shift, and go to state 104
+    BINOP   shift, and go to state 86
+    RELOP   shift, and go to state 87
+    AND     shift, and go to state 88
+    OR      shift, and go to state 89
+
+
+State 83
+
+   55 Exp: Exp . BINOP Exp
+   64    | NOT Exp .
+   65    | Exp . AND Exp
+   66    | Exp . OR Exp
+   67    | Exp . RELOP Exp
+
+    $default  reduce using rule 64 (Exp)
+
+
+State 84
+
+   57 Exp: ID PERIOD . ID
+
+    ID  shift, and go to state 105
+
+
+State 85
+
+   60 Exp: NUM B .
+
+    $default  reduce using rule 60 (Exp)
+
+
+State 86
+
+   55 Exp: Exp BINOP . Exp
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call  go to state 66
+    Exp   go to state 106
+
+
+State 87
+
+   67 Exp: Exp RELOP . Exp
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call  go to state 66
+    Exp   go to state 107
+
+
+State 88
+
+   65 Exp: Exp AND . Exp
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call  go to state 66
+    Exp   go to state 108
+
+
+State 89
+
+   66 Exp: Exp OR . Exp
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call  go to state 66
+    Exp   go to state 109
+
+
+State 90
+
+   43 SimpleStatement: RETURN Exp SC .
+
+    $default  reduce using rule 43 (SimpleStatement)
+
+
+State 91
+
+   24 OpenStatement: IF M1 LPAREN . Exp RPAREN SimpleStatement M2
+   25              | IF M1 LPAREN . Exp RPAREN OpenStatement M2
+   26              | IF M1 LPAREN . Exp RPAREN ClosedStatement M2 ELSE M1 OpenStatement M2
+   29 ClosedStatement: IF M1 LPAREN . Exp RPAREN ClosedStatement M2 ELSE M1 ClosedStatement M2
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call  go to state 66
+    Exp   go to state 110
+
+
+State 92
+
+   27 OpenStatement: WHILE M1 LPAREN . Exp RPAREN M3 OpenStatement M4 M2
+   30 ClosedStatement: WHILE M1 LPAREN . Exp RPAREN M3 ClosedStatement M4 M2
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call  go to state 66
+    Exp   go to state 111
+
+
+State 93
+
+   21 Statements: Statements . Statement
+   33 SimpleStatement: LBRACE $@2 Statements . $@3 RBRACE
+
+    RETURN    shift, and go to state 42
+    IF        shift, and go to state 43
+    WHILE     shift, and go to state 44
+    BREAK     shift, and go to state 45
+    CONTINUE  shift, and go to state 46
+    LBRACE    shift, and go to state 47
+    ID        shift, and go to state 48
+    INT       shift, and go to state 8
+    BYTE      shift, and go to state 9
+    BOOL      shift, and go to state 10
+    STRUCT    shift, and go to state 49
+
+    $default  reduce using rule 32 ($@3)
+
+    Statement        go to state 78
+    OpenStatement    go to state 52
+    ClosedStatement  go to state 53
+    SimpleStatement  go to state 54
+    $@3              go to state 112
+    Call             go to state 55
+    Type             go to state 56
+    StructType       go to state 57
+
+
+State 94
+
+   47 Call: ID LPAREN RPAREN .
+
+    $default  reduce using rule 47 (Call)
+
+
+State 95
+
+   46 Call: ID LPAREN ExpList . RPAREN
+
+    RPAREN  shift, and go to state 113
+
+
+State 96
+
+   48 ExpList: Exp .
+   49        | Exp . COMMA ExpList
+   55 Exp: Exp . BINOP Exp
+   65    | Exp . AND Exp
+   66    | Exp . OR Exp
+   67    | Exp . RELOP Exp
+
+    BINOP  shift, and go to state 86
+    RELOP  shift, and go to state 87
+    AND    shift, and go to state 88
+    OR     shift, and go to state 89
+    COMMA  shift, and go to state 114
+
+    $default  reduce using rule 48 (ExpList)
+
+
+State 97
+
+   40 SimpleStatement: ID PERIOD ID . ASSIGN Exp SC
+
+    ASSIGN  shift, and go to state 115
+
+
+State 98
+
+   39 SimpleStatement: ID ASSIGN Exp . SC
+   55 Exp: Exp . BINOP Exp
+   65    | Exp . AND Exp
+   66    | Exp . OR Exp
+   67    | Exp . RELOP Exp
+
+    BINOP  shift, and go to state 86
+    RELOP  shift, and go to state 87
+    AND    shift, and go to state 88
+    OR     shift, and go to state 89
+    SC     shift, and go to state 116
+
+
+State 99
+
+   36 SimpleStatement: STRUCT ID LBRACE . StructMemList RBRACE SC
+
+    INT   shift, and go to state 8
+    BYTE  shift, and go to state 9
+    BOOL  shift, and go to state 10
+
+    StructMemList  go to state 117
+    StructMem      go to state 20
+    Type           go to state 21
+
+
+State 100
+
+   34 SimpleStatement: Type ID SC .
+
+    $default  reduce using rule 34 (SimpleStatement)
+
+
+State 101
+
+   37 SimpleStatement: Type ID ASSIGN . Exp SC
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call  go to state 66
+    Exp   go to state 118
+
+
+State 102
+
+   35 SimpleStatement: StructType ID SC .
+
+    $default  reduce using rule 35 (SimpleStatement)
+
+
+State 103
+
+   38 SimpleStatement: StructType ID ASSIGN . Exp SC
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call  go to state 66
+    Exp   go to state 119
+
+
+State 104
+
+   54 Exp: LPAREN Exp RPAREN .
+
+    $default  reduce using rule 54 (Exp)
+
+
+State 105
+
+   57 Exp: ID PERIOD ID .
+
+    $default  reduce using rule 57 (Exp)
+
+
+State 106
+
+   55 Exp: Exp . BINOP Exp
+   55    | Exp BINOP Exp .
+   65    | Exp . AND Exp
+   66    | Exp . OR Exp
+   67    | Exp . RELOP Exp
+
+    RELOP  shift, and go to state 87
+    AND    shift, and go to state 88
+    OR     shift, and go to state 89
+
+    $default  reduce using rule 55 (Exp)
+
+
+State 107
+
+   55 Exp: Exp . BINOP Exp
+   65    | Exp . AND Exp
+   66    | Exp . OR Exp
+   67    | Exp . RELOP Exp
+   67    | Exp RELOP Exp .
+
+    AND  shift, and go to state 88
+    OR   shift, and go to state 89
+
+    $default  reduce using rule 67 (Exp)
+
+
+State 108
+
+   55 Exp: Exp . BINOP Exp
+   65    | Exp . AND Exp
+   65    | Exp AND Exp .
+   66    | Exp . OR Exp
+   67    | Exp . RELOP Exp
+
+    OR  shift, and go to state 89
+
+    $default  reduce using rule 65 (Exp)
+
+
+State 109
+
+   55 Exp: Exp . BINOP Exp
+   65    | Exp . AND Exp
+   66    | Exp . OR Exp
+   66    | Exp OR Exp .
+   67    | Exp . RELOP Exp
+
+    $default  reduce using rule 66 (Exp)
+
+
+State 110
+
+   24 OpenStatement: IF M1 LPAREN Exp . RPAREN SimpleStatement M2
+   25              | IF M1 LPAREN Exp . RPAREN OpenStatement M2
+   26              | IF M1 LPAREN Exp . RPAREN ClosedStatement M2 ELSE M1 OpenStatement M2
+   29 ClosedStatement: IF M1 LPAREN Exp . RPAREN ClosedStatement M2 ELSE M1 ClosedStatement M2
+   55 Exp: Exp . BINOP Exp
+   65    | Exp . AND Exp
+   66    | Exp . OR Exp
+   67    | Exp . RELOP Exp
+
+    RPAREN  shift, and go to state 120
+    BINOP   shift, and go to state 86
+    RELOP   shift, and go to state 87
+    AND     shift, and go to state 88
+    OR      shift, and go to state 89
+
+
+State 111
+
+   27 OpenStatement: WHILE M1 LPAREN Exp . RPAREN M3 OpenStatement M4 M2
+   30 ClosedStatement: WHILE M1 LPAREN Exp . RPAREN M3 ClosedStatement M4 M2
+   55 Exp: Exp . BINOP Exp
+   65    | Exp . AND Exp
+   66    | Exp . OR Exp
+   67    | Exp . RELOP Exp
+
+    RPAREN  shift, and go to state 121
+    BINOP   shift, and go to state 86
+    RELOP   shift, and go to state 87
+    AND     shift, and go to state 88
+    OR      shift, and go to state 89
+
+
+State 112
+
+   33 SimpleStatement: LBRACE $@2 Statements $@3 . RBRACE
+
+    RBRACE  shift, and go to state 122
+
+
+State 113
+
+   46 Call: ID LPAREN ExpList RPAREN .
+
+    $default  reduce using rule 46 (Call)
+
+
+State 114
+
+   49 ExpList: Exp COMMA . ExpList
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call     go to state 66
+    ExpList  go to state 123
+    Exp      go to state 96
+
+
+State 115
+
+   40 SimpleStatement: ID PERIOD ID ASSIGN . Exp SC
+
+    LPAREN  shift, and go to state 58
+    NOT     shift, and go to state 59
+    TRUE    shift, and go to state 60
+    FALSE   shift, and go to state 61
+    ID      shift, and go to state 63
+    NUM     shift, and go to state 64
+    STRING  shift, and go to state 65
+
+    Call  go to state 66
+    Exp   go to state 124
+
+
+State 116
+
+   39 SimpleStatement: ID ASSIGN Exp SC .
+
+    $default  reduce using rule 39 (SimpleStatement)
+
+
+State 117
+
+   36 SimpleStatement: STRUCT ID LBRACE StructMemList . RBRACE SC
+
+    RBRACE  shift, and go to state 125
+
+
+State 118
+
+   37 SimpleStatement: Type ID ASSIGN Exp . SC
+   55 Exp: Exp . BINOP Exp
+   65    | Exp . AND Exp
+   66    | Exp . OR Exp
+   67    | Exp . RELOP Exp
+
+    BINOP  shift, and go to state 86
+    RELOP  shift, and go to state 87
+    AND    shift, and go to state 88
+    OR     shift, and go to state 89
+    SC     shift, and go to state 126
+
+
+State 119
+
+   38 SimpleStatement: StructType ID ASSIGN Exp . SC
+   55 Exp: Exp . BINOP Exp
+   65    | Exp . AND Exp
+   66    | Exp . OR Exp
+   67    | Exp . RELOP Exp
+
+    BINOP  shift, and go to state 86
+    RELOP  shift, and go to state 87
+    AND    shift, and go to state 88
+    OR     shift, and go to state 89
+    SC     shift, and go to state 127
+
+
+State 120
+
+   24 OpenStatement: IF M1 LPAREN Exp RPAREN . SimpleStatement M2
+   25              | IF M1 LPAREN Exp RPAREN . OpenStatement M2
+   26              | IF M1 LPAREN Exp RPAREN . ClosedStatement M2 ELSE M1 OpenStatement M2
+   29 ClosedStatement: IF M1 LPAREN Exp RPAREN . ClosedStatement M2 ELSE M1 ClosedStatement M2
+
+    RETURN    shift, and go to state 42
+    IF        shift, and go to state 43
+    WHILE     shift, and go to state 44
+    BREAK     shift, and go to state 45
+    CONTINUE  shift, and go to state 46
+    LBRACE    shift, and go to state 47
+    ID        shift, and go to state 48
+    INT       shift, and go to state 8
+    BYTE      shift, and go to state 9
+    BOOL      shift, and go to state 10
+    STRUCT    shift, and go to state 49
+
+    OpenStatement    go to state 128
+    ClosedStatement  go to state 129
+    SimpleStatement  go to state 130
+    Call             go to state 55
+    Type             go to state 56
+    StructType       go to state 57
+
+
+State 121
+
+   27 OpenStatement: WHILE M1 LPAREN Exp RPAREN . M3 OpenStatement M4 M2
+   30 ClosedStatement: WHILE M1 LPAREN Exp RPAREN . M3 ClosedStatement M4 M2
+
+    $default  reduce using rule 70 (M3)
+
+    M3  go to state 131
+
+
+State 122
+
+   33 SimpleStatement: LBRACE $@2 Statements $@3 RBRACE .
+
+    $default  reduce using rule 33 (SimpleStatement)
+
+
+State 123
+
+   49 ExpList: Exp COMMA ExpList .
+
+    $default  reduce using rule 49 (ExpList)
+
+
+State 124
+
+   40 SimpleStatement: ID PERIOD ID ASSIGN Exp . SC
+   55 Exp: Exp . BINOP Exp
+   65    | Exp . AND Exp
+   66    | Exp . OR Exp
+   67    | Exp . RELOP Exp
+
+    BINOP  shift, and go to state 86
+    RELOP  shift, and go to state 87
+    AND    shift, and go to state 88
+    OR     shift, and go to state 89
+    SC     shift, and go to state 132
+
+
+State 125
+
+   36 SimpleStatement: STRUCT ID LBRACE StructMemList RBRACE . SC
+
+    SC  shift, and go to state 133
+
+
+State 126
+
+   37 SimpleStatement: Type ID ASSIGN Exp SC .
+
+    $default  reduce using rule 37 (SimpleStatement)
+
+
+State 127
+
+   38 SimpleStatement: StructType ID ASSIGN Exp SC .
+
+    $default  reduce using rule 38 (SimpleStatement)
+
+
+State 128
+
+   25 OpenStatement: IF M1 LPAREN Exp RPAREN OpenStatement . M2
+
+    $default  reduce using rule 69 (M2)
+
+    M2  go to state 134
+
+
+State 129
+
+   26 OpenStatement: IF M1 LPAREN Exp RPAREN ClosedStatement . M2 ELSE M1 OpenStatement M2
+   29 ClosedStatement: IF M1 LPAREN Exp RPAREN ClosedStatement . M2 ELSE M1 ClosedStatement M2
+
+    $default  reduce using rule 69 (M2)
+
+    M2  go to state 135
+
+
+State 130
+
+   24 OpenStatement: IF M1 LPAREN Exp RPAREN SimpleStatement . M2
+   28 ClosedStatement: SimpleStatement .
+
+    ELSE      reduce using rule 28 (ClosedStatement)
+    $default  reduce using rule 69 (M2)
+
+    M2  go to state 136
+
+
+State 131
+
+   27 OpenStatement: WHILE M1 LPAREN Exp RPAREN M3 . OpenStatement M4 M2
+   30 ClosedStatement: WHILE M1 LPAREN Exp RPAREN M3 . ClosedStatement M4 M2
+
+    RETURN    shift, and go to state 42
+    IF        shift, and go to state 43
+    WHILE     shift, and go to state 44
+    BREAK     shift, and go to state 45
+    CONTINUE  shift, and go to state 46
+    LBRACE    shift, and go to state 47
+    ID        shift, and go to state 48
+    INT       shift, and go to state 8
+    BYTE      shift, and go to state 9
+    BOOL      shift, and go to state 10
+    STRUCT    shift, and go to state 49
+
+    OpenStatement    go to state 137
+    ClosedStatement  go to state 138
+    SimpleStatement  go to state 54
+    Call             go to state 55
+    Type             go to state 56
+    StructType       go to state 57
+
+
+State 132
+
+   40 SimpleStatement: ID PERIOD ID ASSIGN Exp SC .
+
+    $default  reduce using rule 40 (SimpleStatement)
+
+
+State 133
+
+   36 SimpleStatement: STRUCT ID LBRACE StructMemList RBRACE SC .
+
+    $default  reduce using rule 36 (SimpleStatement)
+
+
+State 134
+
+   25 OpenStatement: IF M1 LPAREN Exp RPAREN OpenStatement M2 .
+
+    $default  reduce using rule 25 (OpenStatement)
+
+
+State 135
+
+   26 OpenStatement: IF M1 LPAREN Exp RPAREN ClosedStatement M2 . ELSE M1 OpenStatement M2
+   29 ClosedStatement: IF M1 LPAREN Exp RPAREN ClosedStatement M2 . ELSE M1 ClosedStatement M2
+
+    ELSE  shift, and go to state 139
+
+
+State 136
+
+   24 OpenStatement: IF M1 LPAREN Exp RPAREN SimpleStatement M2 .
+
+    $default  reduce using rule 24 (OpenStatement)
+
+
+State 137
+
+   27 OpenStatement: WHILE M1 LPAREN Exp RPAREN M3 OpenStatement . M4 M2
+
+    $default  reduce using rule 71 (M4)
+
+    M4  go to state 140
+
+
+State 138
+
+   30 ClosedStatement: WHILE M1 LPAREN Exp RPAREN M3 ClosedStatement . M4 M2
+
+    $default  reduce using rule 71 (M4)
+
+    M4  go to state 141
+
+
+State 139
+
+   26 OpenStatement: IF M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE . M1 OpenStatement M2
+   29 ClosedStatement: IF M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE . M1 ClosedStatement M2
+
+    $default  reduce using rule 68 (M1)
+
+    M1  go to state 142
+
+
+State 140
+
+   27 OpenStatement: WHILE M1 LPAREN Exp RPAREN M3 OpenStatement M4 . M2
+
+    $default  reduce using rule 69 (M2)
+
+    M2  go to state 143
+
+
+State 141
+
+   30 ClosedStatement: WHILE M1 LPAREN Exp RPAREN M3 ClosedStatement M4 . M2
+
+    $default  reduce using rule 69 (M2)
+
+    M2  go to state 144
+
+
+State 142
+
+   26 OpenStatement: IF M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 . OpenStatement M2
+   29 ClosedStatement: IF M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 . ClosedStatement M2
+
+    RETURN    shift, and go to state 42
+    IF        shift, and go to state 43
+    WHILE     shift, and go to state 44
+    BREAK     shift, and go to state 45
+    CONTINUE  shift, and go to state 46
+    LBRACE    shift, and go to state 47
+    ID        shift, and go to state 48
+    INT       shift, and go to state 8
+    BYTE      shift, and go to state 9
+    BOOL      shift, and go to state 10
+    STRUCT    shift, and go to state 49
+
+    OpenStatement    go to state 145
+    ClosedStatement  go to state 146
+    SimpleStatement  go to state 54
+    Call             go to state 55
+    Type             go to state 56
+    StructType       go to state 57
+
+
+State 143
+
+   27 OpenStatement: WHILE M1 LPAREN Exp RPAREN M3 OpenStatement M4 M2 .
+
+    $default  reduce using rule 27 (OpenStatement)
+
+
+State 144
+
+   30 ClosedStatement: WHILE M1 LPAREN Exp RPAREN M3 ClosedStatement M4 M2 .
+
+    $default  reduce using rule 30 (ClosedStatement)
+
+
+State 145
+
+   26 OpenStatement: IF M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 OpenStatement . M2
+
+    $default  reduce using rule 69 (M2)
+
+    M2  go to state 147
+
+
+State 146
+
+   29 ClosedStatement: IF M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 ClosedStatement . M2
+
+    $default  reduce using rule 69 (M2)
+
+    M2  go to state 148
+
+
+State 147
+
+   26 OpenStatement: IF M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 OpenStatement M2 .
+
+    $default  reduce using rule 26 (OpenStatement)
+
+
+State 148
+
+   29 ClosedStatement: IF M1 LPAREN Exp RPAREN ClosedStatement M2 ELSE M1 ClosedStatement M2 .
+
+    $default  reduce using rule 29 (ClosedStatement)
