@@ -89,8 +89,8 @@ addPrints();
 %nonassoc <node> BOOL
 %nonassoc <node> STRUCT
 
-%type <expression> RetType, Call, Type, Exp
-%type <formals_list> FormalsList, Formals
+%type <expression> RetType Call Type Exp
+%type <formals_list> FormalsList Formals
 %type <formal_struct> FormalDecl
 %type <struct_memory_list> StructMemList
 %type <struct_memory> StructMem
