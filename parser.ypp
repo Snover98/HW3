@@ -9,7 +9,7 @@
 
 extern int yylineno;
 
-#define YYSTYPE Node*
+//#define YYSTYPE Node*
 int yylex();
 //void yyerror(const char*);
 
@@ -18,7 +18,7 @@ ExpType varToExp(varType t);
 varType expToVar(ExpType e);
 
 //functions for creating new scopes
-inline void addEmptyScope();
+void addEmptyScope();
 void addFuncScope(const std::string &ID, const std::vector<FormalStruct> &formals, ExpType ret_type);
 //function for removing scope
 void popScope();
@@ -27,21 +27,19 @@ std::string typeToString(varType type);
 //function for function -> string conversion
 std::string funcToString(FunctionType &func_type);
 //get function argument types vector as string
-vector<std::string> funcArgTypes(FunctionType &func_type);
+std::vector<std::string> funcArgTypes(FunctionType &func_type);
 //func that adds print and printi to the symbol table
 void addPrints();
 
 //the struct types defined in the code
 std::vector <std::vector<StructType> > structs_stack;
-structs_stack.push_back(<std::vector<StructType> >());
 //stack of symbol tables
-std::vector<SymTable> tables_stack = std::vector<SymTable>(structs_stack.back());
+std::vector<SymTable> tables_stack;
 //number of conditional scopes (if/else/while) we are in, used to validate break statements
 unsigned int num_of_while_scopes = 0;
 //var for knowing what type the current function returns
 ExpType cur_ret_type = VOIDEXP;
 
-//addPrints();
 
 
 
@@ -56,7 +54,7 @@ ExpType cur_ret_type = VOIDEXP;
     StructMemory* struct_memory;
     StructMemList* struct_memory_list;
     Formal* formal;
-    FormalStruct formal_struct;
+    FormalStruct* formal_struct;
     FormalsList* formals_list;
 }
 
@@ -120,7 +118,7 @@ Funcs:              /*epsilon*/
                     | FuncDecl Funcs
 ;
 
-FuncDecl:           RetType ID LPAREN Formals RPAREN {addFuncScope($2->ID, $4->formals, $1->exp_type;)} LBRACE Statements RBRACE {
+FuncDecl:           RetType ID LPAREN Formals RPAREN {addFuncScope($2->ID, $4->formals, $1->exp_type);} LBRACE Statements RBRACE {
                                                                                                                                      popScope();
                                                                                                                                      cur_ret_type = VOIDEXP;
                                                                                                                                      //delete $1;
@@ -137,7 +135,7 @@ StructsDecl:        STRUCT ID LBRACE StructMemList RBRACE SC {
                                                                     output::errorDef(yylineno, $2->ID);
                                                                     exit(0);
                                                                 }
-                                                                if(tables_stack.isSymInTable($2->ID)){
+                                                                if(tables_stack.back().isSymInTable($2->ID)){
                                                                     output::errorDef(yylineno, $2->ID);
                                                                     exit(0);
                                                                 }
@@ -164,7 +162,7 @@ FormalsList:        FormalDecl {
                     | FormalDecl COMMA FormalsList {
                                                         $$ = $3;
 
-                                                        if(isParamNameTaken($1->ID)){
+                                                        if($3->isParamNameTaken($1->ID)){
                                                             output::errorDef(yylineno, $1->ID);
                                                             exit(0);
                                                         }
@@ -176,19 +174,19 @@ FormalsList:        FormalDecl {
 ;
 
 FormalDecl:         Type ID {
-                                if(tables_stack.back().isSymInTable($1->ID) || isStructTypeInTable(structs_stack, $1->ID)){
-                                    output::errorDef(yylineno, $1->ID);
+                                if(tables_stack.back().isSymInTable($2->ID) || isStructTypeInTable(structs_stack, $2->ID)){
+                                    output::errorDef(yylineno, $2->ID);
                                     exit(0);
                                 }
-                                $$ = new FormalStruct($2->ID, $1-exp_type);
+                                $$ = new FormalStruct($2->ID, $1->exp_type);
 
                                 //delete $1;
                                 //delete $2;
 							}
 
                     | StructType ID {
-                                        if(tables_stack.back().isSymInTable($1->ID) || isStructTypeInTable(structs_stack, $1->ID)){
-                                            output::errorDef(yylineno, $1->ID);
+                                        if(tables_stack.back().isSymInTable($2->ID) || isStructTypeInTable(structs_stack, $2->ID)){
+                                            output::errorDef(yylineno, $2->ID);
                                             exit(0);
                                         }
                                         $$ = new FormalStruct($2->ID, $1->struct_type);
@@ -214,7 +212,7 @@ StructMemList:      StructMem {
 ;
 
 StructMem:          Type ID SC {
-                                    $$ = new StructMemory($2->ID, expToVar($2->exp_type));
+                                    $$ = new StructMemory($2->ID, expToVar($1->exp_type));
                                     //delete $1;
                                     //delete $2;
                                };
@@ -240,7 +238,7 @@ ClosedStatement:    SimpleStatement
 
 SimpleStatement:    LBRACE {addEmptyScope();} Statements {popScope();} RBRACE
                     | Type ID SC {
-                                    if(tables_stack.isSymInTable($2->ID)){
+                                    if(tables_stack.back().isSymInTable($2->ID)){
                                         output::errorDef(yylineno, $2->ID);
                                         exit(0);
                                     }
@@ -249,7 +247,7 @@ SimpleStatement:    LBRACE {addEmptyScope();} Statements {popScope();} RBRACE
                                     //delete $2;
                                  }
                     | StructType ID SC {
-                                        if(tables_stack.isSymInTable($2->ID)){
+                                        if(tables_stack.back().isSymInTable($2->ID)){
                                             output::errorDef(yylineno, $2->ID);
                                             exit(0);
                                         }
@@ -258,7 +256,7 @@ SimpleStatement:    LBRACE {addEmptyScope();} Statements {popScope();} RBRACE
                                         //delete $2;
                                        }
                     | STRUCT ID LBRACE StructMemList RBRACE SC {
-                                                                    if(isStructTypeInTable(structs_stack, $2->ID) || tables_stack.isSymInTable($2->ID)){
+                                                                    if(isStructTypeInTable(structs_stack, $2->ID) || tables_stack.back().isSymInTable($2->ID)){
                                                                         output::errorDef(yylineno, $2->ID);
                                                                         exit(0);
                                                                     }
@@ -267,7 +265,7 @@ SimpleStatement:    LBRACE {addEmptyScope();} Statements {popScope();} RBRACE
                                                                     //delete $4;
                                                                }
                     | Type ID ASSIGN Exp SC {
-                                                if(tables_stack.isSymInTable($2->ID)){
+                                                if(tables_stack.back().isSymInTable($2->ID)){
                                                     output::errorDef(yylineno, $2->ID);
                                                     exit(0);
                                                 }
@@ -281,7 +279,7 @@ SimpleStatement:    LBRACE {addEmptyScope();} Statements {popScope();} RBRACE
                                                 //delete $4;
                                             }
                     | StructType ID ASSIGN Exp SC {
-                                                    if(tables_stack.isSymInTable($2->ID)){
+                                                    if(tables_stack.back().isSymInTable($2->ID)){
                                                         output::errorDef(yylineno, $2->ID);
                                                         exit(0);
                                                     }
@@ -295,9 +293,9 @@ SimpleStatement:    LBRACE {addEmptyScope();} Statements {popScope();} RBRACE
                                                     //delete $4;
                                                   }
                     | ID ASSIGN Exp SC {
-                                            SymEntry e = getSymbolEntry($1->ID);
-                                            if(!tables_stack.isSymInTable($1->ID) || !e.isVariable()){
-                                                output::errorUndef(yylineno);
+                                            SymEntry e = tables_stack.back().getSymbolEntry($1->ID);
+                                            if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()){
+                                                output::errorUndef(yylineno, $1->ID);
                                                 exit(0);
                                             }
                                             if(e.type == STRUCTTYPE){
@@ -315,9 +313,9 @@ SimpleStatement:    LBRACE {addEmptyScope();} Statements {popScope();} RBRACE
                                             delete $3;
                                        }
                     | ID PERIOD ID ASSIGN Exp SC {
-                                                    SymEntry e = getSymbolEntry($1->ID);
-                                                    if(!tables_stack.isSymInTable($1->ID) || !e.isVariable()){
-                                                        output::errorUndef(yylineno);
+                                                    SymEntry e = tables_stack.back().getSymbolEntry($1->ID);
+                                                    if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()){
+                                                        output::errorUndef(yylineno, $1->ID);
                                                         exit(0);
                                                     }
                                                     if(e.type != STRUCTTYPE){
@@ -371,23 +369,26 @@ SimpleStatement:    LBRACE {addEmptyScope();} Statements {popScope();} RBRACE
 ;
 
 Call:               ID LPAREN ExpList RPAREN {
-                                                    SymEntry func_e = getSymbolEntry($1->ID);
-                                                    if(!tables_stack.isSymInTable($1->ID) || e.type != FUNCTYPE){
+                                                    SymEntry func_e = tables_stack.back().getSymbolEntry($1->ID);
+                                                    if(!tables_stack.back().isSymInTable($1->ID) || func_e.type != FUNCTYPE){
                                                         output::errorUndefFunc(yylineno, $1->ID);
                                                         exit(0);
                                                     }
                                                     if($3->expressions.size() != func_e.func_type.first.size()){
-                                                        output::errorPrototypeMismatch(yylineno, $1->ID, funcArgTypes(e.func_type));
+                                                        std::vector<std::string> arg_t = funcArgTypes(func_e.func_type);
+                                                        output::errorPrototypeMismatch(yylineno, $1->ID, arg_t);
                                                         exit(0);
                                                     }
 
                                                     std::vector<Structure>::iterator it_exp =  $3->expressions.begin();
                                                     std::vector<FuncParam>::iterator it_arg =  func_e.func_type.first.begin();
-                                                    for(; it_exp != $3->expressions.end() && it_arg != func_e.func_type.first.end(); ++it_exp && ++it_arg ){
-                                                        if((*it_exp).exp_type != varToExp((*it_arg)) || (*it_arg).type == STRUCTTYPE && (*it_arg).struct_type != (*it_exp).struct_type){
-                                                            output::errorPrototypeMismatch(yylineno, $1->ID, funcArgTypes(e.func_type));
+                                                    for(; it_exp != $3->expressions.end() && it_arg != func_e.func_type.first.end(); ++it_exp){
+                                                        if((*it_exp).exp_type != varToExp((*it_arg).type) || (*it_arg).type == STRUCTTYPE && (*it_arg).struct_type != (*it_exp).struct_type){
+                                                            std::vector<std::string> arg_t = funcArgTypes(func_e.func_type);
+                                                            output::errorPrototypeMismatch(yylineno, $1->ID, arg_t);
                                                             exit(0);
                                                         }
+                                                        ++it_arg;
                                                     }
 
                                                     $$ = new Expression(varToExp(func_e.func_type.second));
@@ -395,13 +396,14 @@ Call:               ID LPAREN ExpList RPAREN {
                                                     //delete $3;
                                              }
                     | ID LPAREN RPAREN {
-                                            SymEntry func_e = getSymbolEntry($1->ID);
-                                            if(!tables_stack.isSymInTable($1->ID) || e.type != FUNCTYPE){
+                                            SymEntry func_e = tables_stack.back().getSymbolEntry($1->ID);
+                                            if(!tables_stack.back().isSymInTable($1->ID) || func_e.type != FUNCTYPE){
                                                 output::errorUndefFunc(yylineno, $1->ID);
                                                 exit(0);
                                             }
                                             if(!func_e.func_type.first.empty()){
-                                                output::errorPrototypeMismatch(yylineno, $1->ID, funcArgTypes(e.func_type))
+                                                std::vector<std::string> arg_t = funcArgTypes(func_e.func_type);
+                                                output::errorPrototypeMismatch(yylineno, $1->ID, arg_t);
                                                 exit(0);
                                             }
 
@@ -428,8 +430,9 @@ Type:               INT {$$ = new Expression(INTEXP);}
 ;
 
 StructType:         STRUCT ID {
+                        //@TODO DO THIS CHECK ONLY WHEN DEFINING NEW STRUCT TYPE
                         if(!isStructTypeInTable(structs_stack, $2->ID)){
-                            output::errorUndefStruct(yylineno, e.struct_type);
+                            output::errorUndefStruct(yylineno, $2->ID);
                             exit(0);
                         }
                         $$ = new Structure($2->ID);
@@ -447,9 +450,9 @@ Exp:                LPAREN Exp RPAREN {$$ = $2;}
                                         //delete $3;
                                     }
                     | ID {
-                            SymEntry e = getSymbolEntry($1->ID);
-                            if(!tables_stack.isSymInTable($1->ID) || !e.isVariable()){
-                                output::errorUndef(yylineno);
+                            SymEntry e = tables_stack.back().getSymbolEntry($1->ID);
+                            if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()){
+                                output::errorUndef(yylineno, $1->ID);
                                 exit(0);
                             }
                             if(e.type == STRUCTEXP){
@@ -460,9 +463,9 @@ Exp:                LPAREN Exp RPAREN {$$ = $2;}
                             //delete $1;
                          }
                     | ID PERIOD ID {
-                                        SymEntry e = getSymbolEntry($1->ID);
-                                        if(!tables_stack.isSymInTable($1->ID) || !e.isVariable()){
-                                            output::errorUndef(yylineno);
+                                        SymEntry e = tables_stack.back().getSymbolEntry($1->ID);
+                                        if(!tables_stack.back().isSymInTable($1->ID) || !e.isVariable()){
+                                            output::errorUndef(yylineno, $1->ID);
                                             exit(0);
                                         }
                                         if(e.type != STRUCTTYPE){
@@ -591,8 +594,9 @@ VarType expToVar(ExpType e){
 }
 
 
-inline void addEmptyScope(){
+void addEmptyScope(){
     tables_stack.push_back(SymTable(structs_stack, tables_stack.back().nextOffset(), &(tables_stack.back())));
+    structs_stack.push_back(<std::vector<StructType> >());
 }
 
 void addFuncScope(const std::string &ID, const std::vector<FormalStruct> &formals, ExpType ret_type){
@@ -648,8 +652,8 @@ std::string typeToString(varType type){
     }
 }
 
-vector<std::string> funcArgTypes(FunctionType &func_type){
-    vector<std::string> argTypes = vector<std::string>();
+std::vector<std::string> funcArgTypes(FunctionType &func_type){
+    std::vector<std::string> argTypes = vector<std::string>();
 
     for(std::vector<FuncParam>::iterator it = func_type.first.begin(); it != func_type.first.end(); ++it){
         argTypes.push_back(typeToString((*it).type) + (((*it).type == STRUCTTYPE) ? (" " + (*it).struct_type) : ""));
@@ -712,6 +716,17 @@ void addPrints(){
 
 int main(){
     //TODO: initialize symbol table
+    structs_stack = std::vector <std::vector<StructType> >();
+    structs_stack.push_back(<std::vector<StructType> >());
+
+    tables_stack = std::vector<SymTable>();
+    tables_stack.push_back(SymTable(structs_stack));
+
+    addPrints();
+
+
+
+
     return yyparse();
 }
 

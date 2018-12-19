@@ -1,8 +1,9 @@
 %{
 /*C lang stuff*/
-#include "parser.tab.hpp"
 #include "Node.h"
 #include "output.hpp"
+#include "parser.tab.hpp"
+#include <string>
 
 %}
 
@@ -66,12 +67,12 @@ continue							return CONTINUE;
 \+|\-|\*|\/							return BINOP;
 
 [a-zA-Z][a-zA-Z0-9]*				{
-                                        yylval = new Identifier(std::string(yytext));
+                                        yylval.identifier = new Identifier(std::string(yytext));
                                         return ID;
                                     }
 
 0|([1-9][0-9]*)						{
-                                        yylval = new Identifier(std::string(yytext));
+                                        yylval.identifier = new Identifier(std::string(yytext));
                                         return NUM;
                                     }
 
@@ -81,7 +82,10 @@ continue							return CONTINUE;
 
 [ \t\r\n]							;
 
-.                                   {output::errorLex(yylineno);exit(0);}
+.                                   {
+                                        output::errorLex(yylineno);
+                                        exit(0);
+                                    }
 
 %%
 

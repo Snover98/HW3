@@ -93,7 +93,7 @@ struct FormalsList : public Node {
 
     FormalsList() : Node(), formals(std::vector<FormalStruct>()) {}
 
-    bool isParamNameTaken(std::string &param_name) {
+    bool isParamNameTaken(const std::string &param_name) {
         //look for a field with the inputted name
         for (std::vector<FormalStruct>::const_iterator it = formals.begin(); it != formals.end(); ++it) {
             if (param_name == (*it).ID) return true;
