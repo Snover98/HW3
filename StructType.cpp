@@ -13,7 +13,8 @@ void addStructType(std::vector<StructType> &structs, StructType t) {
 
 void addStructType(std::vector<StructType> &structs, const std::string &ID,
                    const StructFieldsType &fields) {
-    addStructType(structs, StructType(ID, fields));
+    StructType t = StructType(ID, fields);
+    addStructType(structs, t);
 }
 
 bool isStructTypeInTable(const std::vector<StructType> &structs, const std::string &ID) {
@@ -32,7 +33,7 @@ StructType getStructTypeEntry(const std::vector<StructType> &structs, const std:
     return StructType();
 }
 
-varType StructType::getFieldType(const std::string &field_name) {
+VarType StructType::getFieldType(const std::string &field_name) {
     //find the field with the inputted name
     for (StructFieldsType::const_iterator it = fields.begin(); it != fields.end(); ++it) {
         if (field_name == (*it).first) {

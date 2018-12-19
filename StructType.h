@@ -9,15 +9,15 @@
 #include <string>
 #include "Exceptions.h"
 
-enum varType {
+enum VarType {
     INTTYPE, BYTETYPE, BOOLTYPE, STRUCTTYPE, FUNCTYPE, STRINGTYPE, NOTYPE
 };
 
-typedef std::vector<std::pair<std::string, varType> > StructFieldsType;
+typedef std::vector<std::pair<std::string, VarType> > StructFieldsType;
 
 struct StructType {
-    const std::string type_name;
-    const StructFieldsType fields;
+    std::string type_name;
+    StructFieldsType fields;
 
     StructType() : type_name(std::string("")), fields(StructFieldsType()) {}
 
@@ -25,13 +25,19 @@ struct StructType {
 
     StructType(const std::string& name, const StructFieldsType& fields) : type_name(name), fields(fields) {}
 
-    varType getFieldType(const std::string& field_name);
+    VarType getFieldType(const std::string& field_name);
+
+    StructType& operator=(const StructType& t){
+        type_name = t.type_name;
+        fields = StructFieldsType(fields);
+        return *this;
+    }
 };
 
 void addStructType(std::vector<StructType> &structs, StructType t);
 
 void addStructType(std::vector<StructType> &structs, const std::string &ID,
-                   const std::vector<std::pair<std::string, varType> > &fields);
+                   const std::vector<std::pair<std::string, VarType> > &fields);
 
 bool isStructTypeInTable(const std::vector<StructType> &structs, const std::string &ID);
 

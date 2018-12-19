@@ -6,7 +6,7 @@
 
 #define CALCOFFSET() scope_entries.empty() ? table_offset : scope_entries.back().offset + typeOffset(scope_entries.back())
 
-int SymTable::typeOffset(SymEntry entry) {
+int SymTable::typeOffset(SymEntry& entry) {
     int offset = 0;
 
     switch (entry.type) {
@@ -33,7 +33,7 @@ SymEntry SymTable::getSymbolEntry(const std::string &ID) {
 }
 
 
-varType SymTable::getSymType(const std::string &ID) {
+VarType SymTable::getSymType(const std::string &ID) {
     return getSymbolEntry(ID).type;
 }
 
@@ -61,16 +61,16 @@ void SymTable::addEntry(const std::string &ID, const std::string &struct_type) {
     addEntry(SymEntry(ID, struct_type, CALCOFFSET()));
 }
 
-void SymTable::addEntry(const std::string &ID, varType type) {
+void SymTable::addEntry(const std::string &ID, VarType type) {
     addEntry(SymEntry(ID, type, CALCOFFSET()));
 }
 
-void SymTable::addEntry(const std::string &ID, const std::vector<FuncParam> &func_params, varType ret_type) {
+void SymTable::addEntry(const std::string &ID, const std::vector<FuncParam> &func_params, VarType ret_type) {
     addEntry(SymEntry(ID, func_params, ret_type));
 }
 
 int SymTable::structTypeOffset(const std::string &ID) {
-    return getStructTypeEntry(structs_stack, ID).fields.size();
+    return getStructTypeEntry(*structs_stack, ID).fields.size();
 }
 
 int SymTable::nextOffset(){
