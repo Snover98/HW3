@@ -172,7 +172,7 @@ FormalsList:        FormalDecl {
                                                             exit(0);
                                                         }
 
-                                                        $$->formals.push_back(*$1);
+                                                        $$->formals.insert($$->formals.begin(), *$1);
 
                                                         //delete $1;
                                                    }
@@ -211,7 +211,7 @@ StructMemList:      StructMem {
                                                     output::errorDef(yylineno, $1->field.first);
                                                     exit(0);
                                                 }
-                                                $$->fields.push_back($1->field);
+                                                $$->fields.insert($$->fields.begin(), $1->field);
                                                 //delete $1;
                                               }
 ;
@@ -424,7 +424,7 @@ ExpList:            Exp {
                         }
                     | Exp COMMA ExpList {
                                             $$ = $3;
-                                            $$->expressions.push_back(expressionToList($1));
+                                            $$->expressions.insert($$->expressions.begin(), expressionToList($1));
                                             //delete $1;
                                         }
 ;

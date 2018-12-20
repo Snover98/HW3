@@ -30,6 +30,8 @@ and									return AND;
 
 or									return OR;
 
+not                                 return NOT;
+
 true								return TRUE;
 
 false								return FALSE;
