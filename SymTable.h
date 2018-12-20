@@ -57,7 +57,7 @@ class SymTable {
 private:
     int table_offset;
     std::vector<std::vector<StructType> > *structs_stack;
-    SymTable *parent;
+
 
     int typeOffset(SymEntry& entry);
 
@@ -65,10 +65,10 @@ private:
 public:
     std::vector<SymEntry> scope_entries;
 
-    SymTable(std::vector<std::vector<StructType> > *structs_stack, int offset = 0, SymTable *parent = NULL)
+    SymTable(std::vector<std::vector<StructType> > *structs_stack, int offset = 0)
             : table_offset(offset),
               scope_entries(std::vector<SymEntry>()),
-              parent(parent), structs_stack(structs_stack) {}
+              structs_stack(structs_stack) {}
 
     void addEntry(SymEntry e);
 
@@ -92,6 +92,16 @@ public:
 
     int nextOffset();
 };
+
+SymEntry getSymbolEntry(const std::string &ID, std::vector<SymTable>& tables_stack);
+
+bool isSymInTable(const std::string &ID, std::vector<SymTable>& tables_stack);
+
+VarType getSymType(const std::string &ID, std::vector<SymTable>& tables_stack);
+
+FunctionType getFunctionType(const std::string &ID, std::vector<SymTable>& tables_stack);
+
+std::string getStructType(const std::string &ID, std::vector<SymTable>& tables_stack);
 
 
 #endif //HW3_SYMTABLE_H

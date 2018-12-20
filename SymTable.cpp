@@ -28,8 +28,8 @@ SymEntry SymTable::getSymbolEntry(const std::string &ID) {
         }
     }
 
-    //if there is non, try the parent table, and if this table has no parent return an entry with type of NOTYPE
-    return (parent == NULL) ? SymEntry() : parent->getSymbolEntry(ID);
+    //if there is non return an entry with type of NOTYPE
+    return SymEntry();
 }
 
 
@@ -75,4 +75,32 @@ int SymTable::structTypeOffset(const std::string &ID) {
 
 int SymTable::nextOffset(){
     return CALCOFFSET();
+}
+
+SymEntry getSymbolEntry(const std::string &ID, std::vector<SymTable>& tables_stack){
+    //find the entry with the same ID in each scope
+    for (std::vector<SymTable>::iterator it = tables_stack.begin(); it != tables_stack.end(); ++it) {
+        SymEntry res = (*it).getSymbolEntry(ID);
+        if (ID == res.ID) {
+            return res;
+        }
+    }
+
+    return SymEntry();
+}
+
+bool isSymInTable(const std::string &ID, std::vector<SymTable>& tables_stack){
+    return (getSymbolEntry(ID, tables_stack).type != NOTYPE);
+}
+
+VarType getSymType(const std::string &ID, std::vector<SymTable>& tables_stack){
+    return getSymbolEntry(ID, tables_stack).type;
+}
+
+FunctionType getFunctionType(const std::string &ID, std::vector<SymTable>& tables_stack){
+    return getSymbolEntry(ID, tables_stack).func_type;
+}
+
+std::string getStructType(const std::string &ID, std::vector<SymTable>& tables_stack){
+    return getSymbolEntry(ID, tables_stack).struct_type;
 }
