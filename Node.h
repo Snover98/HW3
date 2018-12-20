@@ -50,8 +50,9 @@ struct ExpressionList : public Node {
 
 struct StructMemory : public Node {
     std::pair<std::string, VarType> field;
+    int line;
 
-    StructMemory(const std::string &ID, VarType type) : field(std::pair<std::string, VarType>(std::string(ID), type)) {}
+    StructMemory(const std::string &ID, VarType type, int line) : field(std::pair<std::string, VarType>(std::string(ID), type)), line(line) {}
 };
 
 struct StructMemList : public Node {
@@ -59,14 +60,18 @@ struct StructMemList : public Node {
 
     StructMemList() : Node(), fields(StructFieldsType()) {}
 
-    bool isFieldNameTaken(std::string &field_name) {
-        //look for a field with the inputted name
+    int fieldLocation(std::string &field_name){
+        int i = 1;
         for (StructFieldsType::const_iterator it = fields.begin(); it != fields.end(); ++it) {
-            if (field_name == (*it).first) return true;
+            if (field_name == (*it).first) return i;
+            ++i;
         }
 
-        //if now field with that name was found, the name is not taken
-        return false;
+        return 0;
+    }
+
+    bool isFieldNameTaken(std::string &field_name) {
+        return (fieldLocation(field_name) > 0);
     }
 };
 

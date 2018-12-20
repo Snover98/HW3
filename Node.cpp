@@ -8,7 +8,7 @@ bool isLegalExpType(Expression *actual, Expression *expected) {
         return (actual->exp_type == INTEXP || actual->exp_type == BYTEEXP);
     }
 
-    if (expected->exp_type == STRUCTEXP) {
+    if (expected->exp_type == STRUCTEXP && actual->exp_type == STRUCTEXP) {
         return (((Structure *) actual)->struct_type == ((Structure *) expected)->struct_type);
     }
 
